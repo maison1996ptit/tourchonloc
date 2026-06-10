@@ -1,0 +1,135 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 6rem 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.header h1 {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+  font-family: var(--font-heading);
+}
+
+.header p {
+  font-size: 1.4rem;
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.countryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 3rem;
+  margin-bottom: 6rem;
+}
+
+.countryCard {
+  height: 450px;
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.countryCard:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 30px 60px rgba(15, 32, 39, 0.25);
+}
+
+.countryImage {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.countryCard:hover .countryImage {
+  transform: scale(1.1);
+}
+
+.countryOverlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, rgba(15, 32, 39, 0) 20%, rgba(15, 32, 39, 0.9) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 50px;
+  color: white;
+}
+
+.countryContent h2 {
+  font-size: 3.5rem;
+  margin-bottom: 10px;
+  font-family: var(--font-heading);
+}
+
+.countryContent p {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  margin-bottom: 30px;
+}
+
+.locationCount {
+  background: var(--accent-color);
+  color: var(--primary-color);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.exploreBtn {
+  display: inline-block;
+  background: white;
+  color: var(--primary-color);
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.countryCard:hover .exploreBtn {
+  background: var(--accent-color);
+  transform: translateX(10px);
+}
+
+.infoSection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  padding: 60px;
+  background: white;
+  border-radius: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.infoItem h3 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.infoItem p {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+@media (max-width: 1000px) {
+  .countryGrid { grid-template-columns: 1fr; }
+  .countryContent h2 { font-size: 2.5rem; }
+  .infoSection { grid-template-columns: 1fr; padding: 40px; }
+}

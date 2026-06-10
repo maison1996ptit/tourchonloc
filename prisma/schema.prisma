@@ -1,0 +1,208 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tour {
+  id               String   @id @default(cuid())
+  title            String
+  slug             String   @unique
+  category         String
+  destination      String
+  region           String
+  durationDays     Int
+  durationNights   Int
+  priceFrom        Float
+  departureDates   String[]
+  shortDescription String
+  overview         String
+  highlights       String[]
+  itinerary        Json
+  included         String[]
+  excluded         String[]
+  priceByGroupSize Json
+  seoTitle         String
+  seoDescription   String
+  status           String   @default("Published")
+  images           String[]
+  featuredImage    String
+  isFeatured       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Blog {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  categoryId    String
+  category      String?
+  author        String?
+  thumbnail     String
+  excerpt       String
+  content       String
+  seoTitle      String
+  seoDescription String
+  tags          String[]
+  publishedDate DateTime @default(now())
+  status        String   @default("Published")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SiteSettings {
+  id                    String   @id @default("main_settings")
+  websiteName           String
+  tagline               String
+  heroHeadline          String
+  heroSubtitle          String
+  heroImage             String
+  heroCTA               Json
+  footerDescription     String
+  contactInfo           Json
+  socialLinks           Json
+  seoDefaultTitle       String
+  seoDefaultDescription String
+  affiliateGear         Json?
+  updatedAt             DateTime @updatedAt
+}
+
+model Lead {
+  id                String   @id @default(cuid())
+  fullName          String
+  email             String
+  phone             String
+  nationality       String?
+  travelDate        String?
+  numberOfTravelers Int?
+  message           String
+  sourceForm        String
+  status            String   @default("New")
+  adminNote         String?
+  reminderDate      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("Editor")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id           String   @id @default(cuid())
+  customerName String
+  country      String
+  avatar       String?
+  flagCode     String?
+  rating       Int
+  content      String
+  language     String
+  status       String   @default("Draft")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  userId     String
+  userName   String
+  entityType String
+  entityName String
+  description String
+  time       DateTime @default(now())
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  type        String   // "Tour" or "Blog"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ThemeSettings {
+  id               String   @id @default("main_theme")
+  activePreset     String
+  useSeasonalTheme Boolean  @default(false)
+  customConfig     Json
+  updatedAt        DateTime @updatedAt
+}
+
+model MenuItem {
+  id        String     @id @default(cuid())
+  label     String
+  url       String
+  order     Int
+  isActive  Boolean    @default(true)
+  type      String     // "Header" or "Footer"
+  parentId  String?
+  parent    MenuItem?  @relation("MenuHierarchy", fields: [parentId], references: [id])
+  children  MenuItem[] @relation("MenuHierarchy")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CountryGuide {
+  id             String         @id @default(cuid())
+  countryName    String
+  countrySlug    String         @unique
+  centerLat      Float
+  centerLng      Float
+  zoom           Int
+  maxBounds      Json?          // [[south, west], [north, east]]
+  markers        RegionMarker[]
+  introduction   String?
+  cultureInfo    String?
+  historyInfo    String?
+  geographyInfo  String?
+  populationInfo String?
+  flag           String?
+  mascot         String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model RegionMarker {
+  id               String       @id @default(cuid())
+  name             String
+  lat              Float
+  lng              Float
+  markerType       String       @default("Spot") // "Spot" or "Airport"
+  contentSlug      String
+  shortDescription String
+  imageUrl         String?      // Representative image for the spot
+  microCopy        String?
+  priority         Int          @default(1)
+  metadata         Json?        // For flight times, etc.
+  countryGuideId   String
+  countryGuide     CountryGuide @relation(fields: [countryGuideId], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model VisaService {
+  id          String   @id @default(cuid())
+  country     String   @unique
+  price       Float
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

@@ -1,0 +1,147 @@
+.seasonalContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: visible;
+}
+
+.cornerDecoration {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+/* Spring - Maneki Neko & Apricot Blossom */
+.spring .manekiNeko {
+  position: relative;
+  font-size: 50px;
+  line-height: 1;
+}
+
+.wavingHand {
+  position: absolute;
+  top: 10px;
+  right: -5px;
+  font-size: 25px;
+  transform-origin: bottom center;
+  animation: wave 1.5s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(30deg); }
+}
+
+.apricotBlossom {
+  position: relative;
+  height: 80px;
+  width: 60px;
+}
+
+.flower {
+  position: absolute;
+  font-size: 20px;
+  animation: bloom 3s ease-in-out infinite;
+}
+
+.flower:nth-child(1) { bottom: 0; left: 0; animation-delay: 0s; }
+.flower:nth-child(2) { bottom: 30px; left: 20px; animation-delay: 0.5s; }
+.flower:nth-child(3) { bottom: 15px; right: 0; animation-delay: 1s; }
+
+@keyframes bloom {
+  0%, 100% { transform: scale(0.8); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Summer - Sun & Palm Tree */
+.summer .sun {
+  font-size: 40px;
+  animation: rotate 10s linear infinite;
+}
+
+.summer .palmTree {
+  font-size: 50px;
+  transform-origin: bottom center;
+  animation: sway 4s ease-in-out infinite;
+}
+
+.waves {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  font-size: 20px;
+  white-space: nowrap;
+  animation: slide 3s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slide {
+  from { transform: translateX(-10px); }
+  to { transform: translateX(10px); }
+}
+
+/* Autumn - Leaf Pile & Falling Leaves */
+.leafPile {
+  font-size: 40px;
+}
+
+.fallingLeaf {
+  position: absolute;
+  top: -100px;
+  font-size: 20px;
+  animation: leafFall 5s linear infinite;
+}
+
+.fallingLeaf:nth-child(2) { left: 20px; animation-delay: 0s; }
+.fallingLeaf:nth-child(3) { left: 50px; animation-delay: 2.5s; }
+
+@keyframes leafFall {
+  0% { transform: translateY(0) rotate(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(120px) rotate(360deg); opacity: 0; }
+}
+
+/* Winter - Snowman & Snowflakes */
+.snowman {
+  font-size: 60px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.snowflake {
+  position: absolute;
+  top: -80px;
+  font-size: 15px;
+  animation: snowFall 4s linear infinite;
+}
+
+.snowflake:nth-child(1) { left: 10px; animation-delay: 0s; }
+.snowflake:nth-child(2) { left: 40px; animation-delay: 1.3s; }
+.snowflake:nth-child(3) { left: 70px; animation-delay: 2.6s; }
+
+@keyframes snowFall {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(100px) translateX(20px); opacity: 0; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}

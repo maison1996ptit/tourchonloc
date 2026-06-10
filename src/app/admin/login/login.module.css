@@ -1,0 +1,78 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.logoWrapper {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+
+.card h1 {
+  margin-bottom: 24px;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.field input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.error {
+  color: #d93025;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.hints {
+  margin-top: 24px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}

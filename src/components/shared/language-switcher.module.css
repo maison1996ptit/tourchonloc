@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: var(--text-color);
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.button:hover {
+  opacity: 1;
+}
+
+.button.active {
+  opacity: 1;
+  color: var(--primary-color);
+}
+
+.divider {
+  color: var(--text-color);
+  opacity: 0.3;
+}
