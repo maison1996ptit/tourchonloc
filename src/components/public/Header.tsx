@@ -15,7 +15,12 @@ export default function Header() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, setLocale } = useLanguage();
+
+  useEffect(() => {
+    // Lock app language to Vietnamese only
+    setLocale('vi');
+  }, [setLocale]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,12 +64,7 @@ export default function Header() {
                 <Link href="/contact" className={styles.navLink}>{t('common.contact')}</Link>
               </>
             )}
-            <Link href="/admin/dashboard" className={styles.navLink}>{t('common.admin')}</Link>
           </nav>
-          
-          <div className={styles.desktopSwitcher}>
-            <LanguageSwitcher />
-          </div>
 
           {/* Hamburger Menu Button */}
           <button 
@@ -101,10 +101,6 @@ export default function Header() {
               <Link href="/contact" className={styles.mobileNavLink} style={{ animationDelay: '0.15s' }} onClick={() => setIsMenuOpen(false)}>{t('common.contact')}</Link>
             </>
           )}
-          <Link href="/admin/dashboard" className={styles.mobileNavLink} style={{ animationDelay: '0.20s' }} onClick={() => setIsMenuOpen(false)}>{t('common.admin')}</Link>
-          <div className={styles.mobileSwitcherContainer}>
-            <LanguageSwitcher />
-          </div>
         </nav>
       </div>
     </header>

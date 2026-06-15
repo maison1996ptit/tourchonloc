@@ -84,6 +84,7 @@ model Lead {
   numberOfTravelers Int?
   message           String
   sourceForm        String
+  tourName          String?
   status            String   @default("New")
   adminNote         String?
   reminderDate      String?

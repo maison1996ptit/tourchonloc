@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { askAiAssistant } from '@/actions/aiActions';
+import { createLead } from '@/actions/leadActions';
 import styles from './AiAssistant.module.css';
 
 interface Message {
@@ -10,8 +11,25 @@ interface Message {
   parts: string;
 }
 
+// Helper function to extract Vietnamese phone numbers (10-12 digits, including clean check)
+const extractPhoneNumber = (text: string): string | null => {
+  // Regex to look for a sequence starting with 0 or +84 followed by digits and optional spaces/dashes/dots
+  const regex = /(?:\+84|0)(?:[\s.-]*\d){9,11}\b/g;
+  const matches = text.match(regex);
+  if (matches) {
+    for (const match of matches) {
+      const digits = match.replace(/[^0-9+]/g, '');
+      if (digits.length >= 10 && digits.length <= 12) {
+        return digits;
+      }
+    }
+  }
+  return null;
+};
+
 export default function AiAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false);
+  const [submittedPhones, setSubmittedPhones] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'model',
@@ -38,6 +56,46 @@ export default function AiAssistantWidget() {
     setMessages(updatedMessages);
     setInput('');
     setIsLoading(true);
+
+    // Detect phone number and automatically capture lead and send email notification
+    const phoneNum = extractPhoneNumber(text);
+    if (phoneNum && !submittedPhones.includes(phoneNum)) {
+      try {
+        const pathname = window.location.pathname;
+        const href = window.location.href;
+        const pageTitle = document.title;
+        
+        let tourName: string | undefined = undefined;
+        let pageContext = '';
+
+        if (pathname.startsWith('/tours/')) {
+          const h1Element = document.querySelector('h1');
+          tourName = h1Element?.innerText || pageTitle.split('-')[0]?.trim() || 'Tour Du Lịch';
+          pageContext = `Khách hàng đang xem tour: ${tourName} (URL: ${href})`;
+        } else {
+          pageContext = `Khách gửi từ trang: ${pageTitle} (URL: ${href})`;
+        }
+
+        // Get the last 5 messages from the conversation history to provide context
+        const last5Messages = updatedMessages.slice(-5);
+        const conversationSnippet = last5Messages
+          .map(msg => `${msg.role === 'user' ? 'Khách' : 'Vy Vy (AI)'}: ${msg.parts}`)
+          .join('\n');
+
+        await createLead({
+          fullName: 'Khách hàng Chatbot',
+          email: '',
+          phone: phoneNum,
+          message: `[Yêu cầu từ Chatbot]\n\nBối cảnh trang: ${pageContext}\n\n--- 5 cuộc hội thoại gần nhất ---\n${conversationSnippet}`,
+          sourceForm: 'Chatbot Inquiry',
+          tourName: tourName,
+        });
+
+        setSubmittedPhones((prev) => [...prev, phoneNum]);
+      } catch (err) {
+        console.error('Failed to create lead from chatbot:', err);
+      }
+    }
 
     try {
       // Pass the conversation history (excluding the first welcome message to keep prompt clean, or pass all)

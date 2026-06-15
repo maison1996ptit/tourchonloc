@@ -3,7 +3,8 @@ import {
   createLead, 
   updateLead, 
   deleteLead,
-  bulkCreateLeads
+  bulkCreateLeads,
+  sendMarketingCampaignAction
 } from '@/actions/leadActions';
 
 export const leadService = {
@@ -12,4 +13,5 @@ export const leadService = {
   updateLead,
   deleteLead,
   bulkCreateLeads,
+  sendMarketingCampaignAction,
 };

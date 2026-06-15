@@ -52,6 +52,7 @@ export default function InquiryForm({ source, tourTitle, preferredDate, defaultM
       await leadService.createLead({
         ...formData,
         sourceForm: source,
+        tourName: tourTitle || undefined,
         message: finalMessage,
         travelDate: preferredDate
       });

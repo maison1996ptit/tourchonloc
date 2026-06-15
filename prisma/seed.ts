@@ -229,8 +229,8 @@ async function main() {
     { label: 'Trang chủ', url: '/', order: 1 },
     { label: 'Tour du lịch', url: '/tours', order: 2 },
     { label: 'Dịch vụ Visa', url: '/visa', order: 3 },
-    { label: 'Về chúng tôi', url: '/about', order: 4 },
-    { label: 'Liên hệ', url: '/contact', order: 5 }
+    { label: 'Blog', url: '/blogs', order: 4 },
+    { label: 'Về chúng tôi', url: '/about', order: 5 }
   ];
   for (const item of headerMenu) {
     await prisma.menuItem.create({

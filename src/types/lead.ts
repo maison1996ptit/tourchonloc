@@ -1,5 +1,5 @@
 export type LeadStatus = 'New' | 'Contacted' | 'Converted' | 'Failed' | 'Closed';
-export type LeadSource = 'Customize Trip' | 'Tour Inquiry' | 'Download Guide' | 'Newsletter' | 'Imported' | 'Visa Inquiry';
+export type LeadSource = 'Customize Trip' | 'Tour Inquiry' | 'Download Guide' | 'Newsletter' | 'Imported' | 'Visa Inquiry' | 'Chatbot Inquiry';
 
 export interface Lead {
   id: string;
@@ -11,6 +11,7 @@ export interface Lead {
   numberOfTravelers?: number;
   message: string;
   sourceForm: LeadSource;
+  tourName?: string;
   status: LeadStatus;
   adminNote?: string;
   reminderDate?: string;

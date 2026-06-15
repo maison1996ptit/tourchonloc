@@ -6,7 +6,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  height: 80px;
+  height: 68px; /* Increased by 20% vertically (56px * 1.2 = 67.2px, rounded to 68px) */
   transition: all 0.3s ease;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
@@ -22,17 +22,19 @@
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   text-decoration: none;
-  height: 100%;
-  width: 216px; /* Increased width by 20% */
+  height: 68px; /* Match desktop header height */
+  width: 176px; /* Reduced by another 10% (196px * 0.9 = 176px) */
+  position: relative;
 }
 
 .logoImage {
-  height: 168px; /* Increased height by 20% */
-  width: 216px; /* Increased width by 20% */
+  position: absolute;
+  top: -34px; /* Centered vertically relative to 68px header: (68px - 137px) / 2 */
+  left: 0;
+  height: 137px !important; /* Reduced by another 10% (152px * 0.9 = 137px) */
+  width: 176px !important;  /* Reduced by another 10% (196px * 0.9 = 176px) */
   object-fit: contain;
   z-index: 10;
   animation: logoFloat 4s ease-in-out infinite;
@@ -269,16 +271,21 @@
 
 @media (max-width: 480px) {
   .header {
-    height: 70px;
+    height: 60px; /* Increased by 20% vertically (50px * 1.2 = 60px) */
   }
   .headerContainer {
     padding: 0 15px;
   }
   .logo {
-    width: 140px;
+    width: 114px; /* Reduced by another 10% (127px * 0.9 = 114px) */
+    height: 60px; /* Match mobile header height */
+    position: relative;
   }
   .logoImage {
-    height: 60px;
-    width: 120px;
+    position: absolute;
+    top: 5px; /* Centered vertically relative to 60px header: (60px - 49px) / 2 */
+    left: 8px;  /* Centered horizontally: (114px - 98px) / 2 */
+    height: 49px !important; /* Reduced by another 10% (55px * 0.9 = 49px) */
+    width: 98px !important;  /* Reduced by another 10% (109px * 0.9 = 98px) */
   }
 }

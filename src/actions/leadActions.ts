@@ -2,8 +2,10 @@
 
 import { prisma } from '@/lib/prisma';
 import { Lead, LeadStatus, LeadSource } from '@/types/lead';
+import { Tour } from '@/types/tour';
 import { revalidatePath } from 'next/cache';
 import { isEditor } from '@/lib/auth-utils';
+import { sendLeadNotificationEmail, sendMarketingEmail } from '@/lib/mail';
 
 export async function getLeads() {
   if (!(await isEditor())) throw new Error('Unauthorized');
@@ -21,6 +23,7 @@ export async function getLeads() {
     sourceForm: l.sourceForm as LeadSource,
     status: l.status as LeadStatus,
     nationality: l.nationality ?? undefined,
+    tourName: l.tourName ?? undefined,
     createdAt: l.createdAt.toISOString(),
     updatedAt: l.updatedAt.toISOString(),
   }));
@@ -38,9 +41,17 @@ export async function createLead(lead: Omit<Lead, 'id' | 'createdAt' | 'updatedA
       numberOfTravelers: lead.numberOfTravelers,
       message: lead.message,
       sourceForm: lead.sourceForm,
+      tourName: lead.tourName,
       status: 'New',
     }
   });
+
+  // Send email notification in the background
+  try {
+    await sendLeadNotificationEmail(lead);
+  } catch (err) {
+    console.error('Failed to send lead notification email:', err);
+  }
 
   revalidatePath('/admin/leads');
 
@@ -53,6 +64,7 @@ export async function createLead(lead: Omit<Lead, 'id' | 'createdAt' | 'updatedA
     sourceForm: l.sourceForm as LeadSource,
     status: l.status as LeadStatus,
     nationality: l.nationality ?? undefined,
+    tourName: l.tourName ?? undefined,
     createdAt: l.createdAt.toISOString(),
     updatedAt: l.updatedAt.toISOString(),
   };
@@ -85,6 +97,7 @@ export async function updateLead(id: string, updates: Partial<Lead>) {
     sourceForm: l.sourceForm as LeadSource,
     status: l.status as LeadStatus,
     nationality: l.nationality ?? undefined,
+    tourName: l.tourName ?? undefined,
     createdAt: l.createdAt.toISOString(),
     updatedAt: l.updatedAt.toISOString(),
   };
@@ -103,6 +116,7 @@ export async function bulkCreateLeads(leads: any[]) {
       numberOfTravelers: l.numberOfTravelers,
       message: l.message,
       sourceForm: l.sourceForm,
+      tourName: l.tourName,
       status: l.status || 'New',
     }))
   });
@@ -122,4 +136,51 @@ export async function deleteLead(id: string) {
   } catch (e) {
     return { success: false };
   }
+}
+
+export async function sendMarketingCampaignAction(
+  leadIds: string[],
+  subject: string,
+  body: string,
+  tourIds: string[]
+) {
+  if (!(await isEditor())) throw new Error('Unauthorized');
+
+  // Fetch leads and selected tours
+  const [selectedLeads, selectedTours] = await Promise.all([
+    prisma.lead.findMany({
+      where: { id: { in: leadIds } }
+    }),
+    prisma.tour.findMany({
+      where: { id: { in: tourIds } }
+    })
+  ]);
+
+  // Map tours database model to Tour interface type
+  const mappedTours: Tour[] = selectedTours.map(t => ({
+    ...t,
+    departureDates: t.departureDates,
+    highlights: t.highlights,
+    itinerary: t.itinerary as any,
+    included: t.included,
+    excluded: t.excluded,
+    priceByGroupSize: t.priceByGroupSize as any,
+    status: t.status as any,
+    createdAt: t.createdAt.toISOString(),
+    updatedAt: t.updatedAt.toISOString(),
+  }));
+
+  // Send emails in parallel
+  const sendPromises = selectedLeads.map(async (lead) => {
+    if (lead.email) {
+      try {
+        await sendMarketingEmail(lead.email, lead.fullName, subject, body, mappedTours);
+      } catch (err) {
+        console.error(`Failed to send marketing email to ${lead.email}:`, err);
+      }
+    }
+  });
+
+  await Promise.all(sendPromises);
+  return { success: true, count: selectedLeads.filter(l => l.email).length };
 }
