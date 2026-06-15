@@ -9,6 +9,8 @@ const ralewayBody = Raleway({ subsets: ["latin", "vietnamese"], variable: "--fon
 const ralewayHeading = Raleway({ subsets: ["latin", "vietnamese"], variable: "--font-heading", weight: ['400', '500', '600', '700', '800', '900'] });
 const caveat = Caveat({ subsets: ["latin"], variable: "--font-accent", weight: ['400', '700'] });
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "TravelApp - Đại lý Du lịch Sang trọng",
   description: "Trải nghiệm thế giới theo phong cách riêng với các tour du lịch bản sắc của chúng tôi.",
