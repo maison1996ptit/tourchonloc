@@ -5,6 +5,7 @@ Tài liệu này cung cấp hướng dẫn từng bước để triển khai ứ
 ---
 
 ## MỤC LỤC
+0. [Triển khai nhanh bằng Script Tự Động (Khuyên dùng)](#triển-khai-nhanh-bằng-script-tự-động-khuyên-dùng)
 1. [Yêu cầu hệ thống](#1-yêu-cầu-hệ-thống)
 2. [Cài đặt Docker & Docker Compose trên Ubuntu](#2-cài-đặt-docker--docker-compose-trên-ubuntu)
 3. [Chuẩn bị mã nguồn và Biến môi trường](#3-chuẩn-bị-mã-nguồn-và-biến-môi-trường)
@@ -14,6 +15,23 @@ Tài liệu này cung cấp hướng dẫn từng bước để triển khai ứ
 7. [Bảo trì và Cập nhật ứng dụng](#7-bảo-trì-và-cập-nhật-ứng-dụng)
 
 ---
+
+## TRIỂN KHAI NHANH BẰNG SCRIPT TỰ ĐỘNG (KHUYÊN DÙNG)
+
+Dự án đã tích hợp sẵn script tự động hóa toàn bộ quá trình cài đặt và cấu hình: [deploy.sh](file:///D:/TravelApp/deploy.sh). Bạn chỉ cần mở terminal trên server Ubuntu, di chuyển vào thư mục dự án và chạy:
+
+```bash
+# Cấp quyền thực thi cho script
+chmod +x deploy.sh
+
+# Chạy script tự động với quyền root
+sudo ./deploy.sh
+```
+
+Script sẽ thực thi tuần tự các công việc và hiển thị thông báo tiến trình rõ ràng cho bạn.
+
+---
+
 
 ## 1. Yêu cầu hệ thống
 *   **Hệ điều hành:** Ubuntu Server 20.04 LTS / 22.04 LTS / 24.04 LTS.
