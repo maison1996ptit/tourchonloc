@@ -12,13 +12,13 @@ export const mockSiteSettings: SiteSettings = {
   },
   footerDescription: 'We specialize in providing unique and luxury travel experiences across South East Asia.',
   contactInfo: {
-    phone: ['+84 123 456 789'],
-    email: ['info@luxurytravel.com'],
-    officeAddresses: ['123 Le Loi, District 1, Ho Chi Minh City, Vietnam']
+    phone: ['+84 372 521 237'],
+    email: ['fit.saletourchonloc@gmail.com'],
+    officeAddresses: ['535/25 Pham Van Dong, Binh Loi Trung , Ho Chi Minh City, Vietnam']
   },
   socialLinks: {
-    facebook: 'https://facebook.com/luxurytravel',
-    instagram: 'https://instagram.com/luxurytravel'
+     zalo: 'https://zalo.me/84372521237',
+    // instagram: 'https://instagram.com/luxurytravel'
   },
   seoDefaultTitle: 'Luxury Travel Agency - Authentic South East Asia Tours',
   seoDefaultDescription: 'Discover luxury and authentic travel experiences in Vietnam, Thailand, and Bali with our expert local guides.',

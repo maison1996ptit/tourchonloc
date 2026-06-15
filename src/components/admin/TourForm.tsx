@@ -69,8 +69,9 @@ export default function TourForm({ initialData, isEdit }: TourFormProps) {
     formDataObj.append('file', file);
 
     try {
-      const result = await parseTourPDF(formDataObj);
-      if (result) {
+      const response = await parseTourPDF(formDataObj);
+      if (response.success && response.data) {
+        const result = response.data;
         // Sanitize departureDates to YYYY-MM-DD format
         const formattedDates = (result.departureDates || []).map((dateStr: string) => {
           if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
@@ -118,10 +119,12 @@ export default function TourForm({ initialData, isEdit }: TourFormProps) {
           images: result.images || (result.featuredImage ? [result.featuredImage] : (prev.images || [])),
         }));
         alert('Phân tích file PDF thành công! Đã tự động điền các thông tin của Tour. Vui lòng kiểm tra lại trước khi lưu.');
+      } else {
+        alert('Lỗi phân tích file PDF: ' + (response.error || 'Lỗi không xác định từ máy chủ'));
       }
     } catch (err) {
       console.error(err);
-      alert('Lỗi phân tích file PDF: ' + (err as Error).message);
+      alert('Lỗi kết nối hoặc xử lý file PDF: ' + (err as Error).message);
     } finally {
       setIsParsing(false);
       e.target.value = '';

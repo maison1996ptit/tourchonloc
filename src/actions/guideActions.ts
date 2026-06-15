@@ -136,6 +136,12 @@ export async function getMarkerDetailContent(markerName: string, countryName: st
   if (!apiKey) {
     return "Không thể kết nối dịch vụ thông tin.";
   }
+
+  if (/[^\x00-\x7F]/.test(apiKey)) {
+    console.error("LỖI CẤU HÌNH: GEMINI_API_KEY trên server chứa ký tự tiếng Việt (có thể do bật Unikey/EVKey khi paste). Vui lòng tắt bộ gõ tiếng Việt và dán lại API key vào file .env.");
+    return "Không thể kết nối dịch vụ thông tin do lỗi cấu hình API key.";
+  }
+
   const genAI = new GoogleGenerativeAI(apiKey);
   const modelsToTry = ['gemini-2.5-flash', 'gemini-1.5-flash-8b'];
   let lastError = null;

@@ -40,6 +40,11 @@ export async function askAiAssistant(history: ChatMessage[], message: string): P
       return "Xin lỗi bạn, hệ thống AI tư vấn đang tạm thời bảo trì API. Vui lòng thử lại sau ít phút!";
     }
 
+    if (/[^\x00-\x7F]/.test(apiKey)) {
+      console.error("LỖI CẤU HÌNH: GEMINI_API_KEY trên server chứa ký tự tiếng Việt (có thể do bật Unikey/EVKey khi paste). Vui lòng tắt bộ gõ tiếng Việt và dán lại API key vào file .env.");
+      return "Xin lỗi bạn, hệ thống AI tư vấn đang gặp lỗi cấu hình khóa API. Vui lòng thử lại sau ít phút!";
+    }
+
     const genAI = new GoogleGenerativeAI(apiKey);
     const modelsToTry = ['gemini-2.5-flash', 'gemini-1.5-flash-8b'];
     let textResponse = '';

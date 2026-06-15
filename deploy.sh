@@ -12,6 +12,15 @@ echo -e "${GREEN}===============================================================
 echo -e "${GREEN}   BẮT ĐẦU TỰ ĐỘNG DỰNG DATABASE VÀ TRIỂN KHAI ỨNG DỤNG           ${NC}"
 echo -e "${GREEN}==================================================================${NC}"
 
+# Kiểm tra file .env
+if [ ! -f .env ]; then
+    echo -e "${RED}[LỖI] Không tìm thấy file .env trong thư mục dự án trên máy chủ!${NC}"
+    echo -e "Vì lý do bảo mật, file .env (chứa các API Key và cấu hình cơ sở dữ liệu) bị chặn bởi Git và không thể tự động đồng bộ."
+    echo -e "Vui lòng tạo file .env bằng cách chạy lệnh sau và điền thông tin:"
+    echo -e "nano .env"
+    exit 1
+fi
+
 # 1. Khởi chạy Database Docker Container từ docker-compose.yml gốc
 echo -e "\n${YELLOW}[1/6] Khởi chạy Database trong Docker...${NC}"
 if ! [ -x "$(command -v docker)" ]; then

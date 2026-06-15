@@ -4,6 +4,7 @@ export interface SocialLinks {
   twitter?: string;
   youtube?: string;
   linkedin?: string;
+  zalo?: string;
 }
 
 export interface ContactInfo {
