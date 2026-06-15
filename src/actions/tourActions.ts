@@ -414,14 +414,32 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
         return { success: false, error: 'pdf-parse library export is not a function' };
       }
       
-      let pdfData;
       try {
-        pdfData = await new pdfParseFn(buffer);
+        // Cách dùng 1: Thư viện pdf-parse v2 (class-based)
+        const parser = new pdfParseFn({ data: buffer });
+        if (parser && typeof parser.getText === 'function') {
+          const result = await parser.getText();
+          rawText = result.text;
+        } else {
+          // Fallback nếu không khởi tạo đúng class
+          const pdfData = await pdfParseFn(buffer);
+          rawText = pdfData.text;
+        }
       } catch (constructErr) {
-        // Fallback in case it's a standard function that cannot be instantiated with new
-        pdfData = await pdfParseFn(buffer);
+        // Cách dùng 2: Thư viện pdf-parse v1 (legacy function)
+        try {
+          const pdfData = await pdfParseFn(buffer);
+          rawText = pdfData.text;
+        } catch (legacyErr) {
+          // Fallback cuối cùng
+          const pdfData = await new pdfParseFn(buffer);
+          rawText = pdfData.text;
+        }
       }
-      rawText = pdfData.text;
+
+      if (!rawText) {
+        return { success: false, error: 'Không thể trích xuất văn bản từ file PDF (nội dung trống).' };
+      }
     } catch (err) {
       console.error('Error parsing PDF text:', err);
       return { success: false, error: 'Không thể đọc nội dung file PDF. Vui lòng kiểm tra định dạng file.' };
