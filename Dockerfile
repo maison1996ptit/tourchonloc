@@ -26,5 +26,5 @@ EXPOSE 3000
 ENV PORT 3000
 ENV NODE_ENV production
 
-# Run database migrations and start the application
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
+# Run database migrations, check/run seeding, and start the application
+CMD ["sh", "-c", "npx prisma migrate deploy && npx tsx prisma/check-and-seed.ts && npm run start"]

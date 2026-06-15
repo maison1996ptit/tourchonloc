@@ -21,7 +21,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # 2. Cài đặt Docker & Docker Compose nếu chưa có
-echo -e "\n${YELLOW}[1/6] Kiểm tra môi trường Docker...${NC}"
+echo -e "\n${YELLOW}[1/5] Kiểm tra môi trường Docker...${NC}"
 if ! [ -x "$(command -v docker)" ]; then
     echo -e "${YELLOW}Docker chưa được cài đặt. Tiến hành cài đặt Docker...${NC}"
     apt-get update
@@ -44,7 +44,7 @@ else
 fi
 
 # 3. Khởi tạo file cấu hình môi trường .env
-echo -e "\n${YELLOW}[2/6] Kiểm tra cấu hình file .env...${NC}"
+echo -e "\n${YELLOW}[2/5] Kiểm tra cấu hình file .env...${NC}"
 if [ ! -f .env ]; then
     echo -e "${YELLOW}Không tìm thấy file .env. Tự động tạo file .env mới từ file .env.example...${NC}"
     if [ -f .env.example ]; then
@@ -69,33 +69,31 @@ echo -e "${YELLOW}------------------------------------------------------------${
 read -p "Ấn [ENTER] để tiếp tục quá trình xây dựng Docker..."
 
 # 4. Build và khởi chạy Docker Compose
-echo -e "\n${YELLOW}[3/6] Build và khởi chạy Docker Container...${NC}"
+echo -e "\n${YELLOW}[3/5] Build và khởi chạy Docker Container...${NC}"
 docker compose -f docker-compose.prod.yml down --remove-orphans || true
 docker compose -f docker-compose.prod.yml up -d --build
 
-# 5. Chờ cơ sở dữ liệu sẵn sàng và chạy Seeding dữ liệu
-echo -e "\n${YELLOW}[4/6] Đợi cơ sở dữ liệu sẵn sàng nhận kết nối...${NC}"
-# Chờ tối đa 30s
-for i in {1..30}; do
+# 5. Đợi ứng dụng khởi chạy (tự động chạy Migration & Seed bên trong Container)
+echo -e "\n${YELLOW}[4/5] Đợi cơ sở dữ liệu và ứng dụng khởi chạy...${NC}"
+for i in {1..20}; do
     if docker compose -f docker-compose.prod.yml exec db pg_isready -U admin -d travelapp >/dev/null 2>&1; then
-        echo -e "${GREEN}[OK] Cơ sở dữ liệu PostgreSQL đã sẵn sàng!${NC}"
+        echo -e "${GREEN}[OK] Cơ sở dữ liệu và ứng dụng Next.js đang khởi động và chạy di cư dữ liệu tự động...${NC}"
         break
     fi
-    if [ $i -eq 30 ]; then
-        echo -e "${RED}[LỖI] Quá thời gian chờ cơ sở dữ liệu khởi động! Vui lòng kiểm tra logs bằng lệnh: docker compose logs db${NC}"
+    if [ $i -eq 20 ]; then
+        echo -e "${RED}[LỖI] Quá thời gian chờ cơ sở dữ liệu khởi động!${NC}"
         exit 1
     fi
-    echo -e "Đang chờ cơ sở dữ liệu khởi động... ($i/30)"
+    echo -e "Đang chờ cơ sở dữ liệu sẵn sàng... ($i/20)"
     sleep 2
 done
 
-# Chạy seed dữ liệu mẫu
-echo -e "\n${YELLOW}[5/6] Tiến hành nạp dữ liệu mẫu ban đầu (Database Seeding)...${NC}"
-docker compose -f docker-compose.prod.yml exec web npx prisma db seed
-echo -e "${GREEN}[OK] Seed dữ liệu hoàn tất thành công!${NC}"
+# Đợi thêm vài giây để Prisma chạy xong check-and-seed
+sleep 5
+echo -e "${GREEN}[OK] Quá trình tự động dựng database & nạp dữ liệu mẫu đang diễn ra trong container.${NC}"
 
 # 6. Hỏi người dùng có muốn cài đặt Nginx Reverse Proxy và SSL không
-echo -e "\n${YELLOW}[6/6] Cấu hình Nginx Reverse Proxy & SSL HTTPS...${NC}"
+echo -e "\n${YELLOW}[5/5] Cấu hình Nginx Reverse Proxy & SSL HTTPS...${NC}"
 read -p "Bạn có muốn cài đặt và cấu hình tự động Nginx + SSL HTTPS Let's Encrypt không? (y/n): " confirm_nginx
 
 if [[ "$confirm_nginx" =~ ^[Yy]$ ]]; then
