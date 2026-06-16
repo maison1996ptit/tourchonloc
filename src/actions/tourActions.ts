@@ -361,7 +361,9 @@ async function searchMultipleLandmarkImages(
 
 export async function parseTourPDF(formData: FormData): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    if (!(await isEditor())) {
+    const isAuthorized = await isEditor();
+    if (!isAuthorized) {
+      console.error("[Auth Check] Unauthorized access attempt to parseTourPDF");
       return { success: false, error: 'Bạn không có quyền thực hiện hành động này.' };
     }
 
