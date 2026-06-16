@@ -457,50 +457,53 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const modelsToTry = ['gemini-3.5-flash', 'gemini-2.5-flash'];
+      const modelsToTry = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro'];
       let lastError: Error | null = null;
       let textResponse = '';
 
       const prompt = `
-Bạn là một trợ lý thông minh giúp chuyển đổi lịch trình du lịch dạng văn bản thô (được trích xuất từ file PDF) thành một cấu trúc dữ liệu JSON chính xác để đưa vào cơ sở dữ liệu.
-Hãy trích xuất tất cả các thông tin từ văn bản dưới đây và trả về dưới dạng JSON khớp hoàn toàn với cấu trúc sau:
+Bạn là một trợ lý thông minh chuyên nghiệp chuyên chuyển đổi lịch trình du lịch từ văn bản thô (trích xuất từ PDF) sang JSON.
+Hãy phân tích kỹ văn bản dưới đây và trích xuất thông tin một cách chính xác nhất có thể.
+
+Yêu cầu đặc biệt:
+1. departureDates: Hãy tìm tất cả các ngày khởi hành trong bảng lịch khởi hành hoặc phần ghi chú. Trích xuất TẤT CẢ các ngày có thể tìm thấy. Chuyển đổi về định dạng DD/MM/YYYY. Ví dụ: ["22/05/2026", "12/06/2026"].
+2. priceFrom: Tìm giá tiền thấp nhất cho người lớn. Trả về kiểu số (number), ví dụ: 18990000.
+3. priceByGroupSize: Nếu có bảng giá theo nhóm khách hoặc loại khách (người lớn, trẻ em), hãy trích xuất vào mảng này. Ví dụ: [{"groupSize": "Người lớn", "pricePerPerson": 18990000}, {"groupSize": "Trẻ em (2-11 tuổi)", "pricePerPerson": 16990000}].
+4. durationDays & durationNights: Đếm số ngày và đêm từ lịch trình.
+5. itinerary: Trích xuất tiêu đề ngày và danh sách các hoạt động chi tiết cho mỗi ngày.
+6. imageSearchTerms: Tạo danh sách 10-15 từ khóa tiếng Anh cực kỳ chính xác. Quan trọng: Phải bao quát TẤT CẢ các thành phố và địa danh lớn xuất hiện trong lịch trình (ví dụ: mỗi ngày chọn ra 1-2 địa điểm đặc sắc nhất). Mỗi từ khóa phải bao gồm tên thành phố để tìm kiếm chính xác, ví dụ: ["Victoria Peak Hong Kong", "Repulse Bay Hong Kong", "Shenzhen Window of the World", "Guangzhou Yuexiu Park"].
+
+Cấu trúc JSON trả về:
 {
-  "title": "Tên chuyến du lịch hấp dẫn, ví dụ: Nhật Bản: Cung Đường Vàng Osaka - Kyoto - Tokyo (5N5Đ)",
-  "category": "Tên khu vực/danh mục thích hợp nhất (ví dụ: Đông Á, Đông Nam Á, Châu Âu, Mỹ)",
-  "destination": "Quốc gia hoặc thành phố điểm đến chính, ví dụ: Nhật Bản hoặc Hong Kong - Thâm Quyến - Quảng Châu",
-  "region": "Khu vực du lịch phù hợp, ví dụ: Đông Á",
-  "durationDays": số ngày (kiểu number),
-  "durationNights": số đêm (kiểu number),
-  "priceFrom": mức giá thấp nhất tìm thấy cho người lớn (kiểu number), ví dụ: 18990000,
-  "departureDates": danh sách các ngày khởi hành định dạng DD/MM/YYYY tìm thấy trong bảng giá, ví dụ: ["22/05/2026", "12/06/2026"],
-  "shortDescription": "Viết một đoạn mô tả ngắn 2-3 câu thu hút khách hàng về tour này",
-  "overview": "Đoạn mô tả tổng quan chi tiết hơn về tour",
-  "highlights": [
-    "Danh sách 3-5 điểm nhấn nổi bật nhất của tour, ví dụ: Trải nghiệm tàu điện cổ núi Thái Bình"
+  "title": "Tên tour đầy đủ",
+  "category": "Danh mục khu vực (Đông Á, Châu Âu...)",
+  "destination": "Các nước/thành phố đi qua (ví dụ: Hong Kong - Thâm Quyến - Quảng Châu)",
+  "region": "Vùng miền du lịch",
+  "durationDays": number,
+  "durationNights": number,
+  "priceFrom": number,
+  "priceByGroupSize": [
+    { "groupSize": "string", "pricePerPerson": number }
   ],
+  "departureDates": ["DD/MM/YYYY", ...],
+  "shortDescription": "Mô tả ngắn hấp dẫn",
+  "overview": "Tổng quan tour",
+  "highlights": ["Điểm nhấn 1", "Điểm nhấn 2", ...],
   "itinerary": [
     {
-      "day": số ngày (number),
-      "title": "Tiêu đề của ngày đó",
-      "activities": [
-        "Danh sách các hoạt động chính trong ngày đó, ghi rõ ràng đầy đủ chi tiết từ văn bản lịch trình"
-      ]
+      "day": number,
+      "title": "Tiêu đề ngày",
+      "activities": ["Hoạt động 1", "Hoạt động 2", ...]
     }
   ],
-  "included": [
-    "Danh sách các dịch vụ bao gồm"
-  ],
-  "excluded": [
-    "Danh sách các dịch vụ không bao gồm"
-  ],
-  "seoTitle": "Tiêu đề tối ưu SEO",
-  "seoDescription": "Mô tả ngắn tối ưu SEO",
-  "imageSearchTerms": [
-    "Danh sách các từ khóa tiếng Anh cực kỳ chính xác đại diện cho tất cả các điểm đến và địa danh nổi bật của tour để dùng làm từ khóa tìm kiếm ảnh chất lượng cao. Ví dụ: ['Hong Kong Skyline', 'Shenzhen Skyline', 'Victoria Peak Hong Kong', 'Repulse Bay Hong Kong', 'Five Rams Statue Guangzhou', 'Splendid China Folk Village Shenzhen']"
-  ]
+  "included": ["Dịch vụ bao gồm 1", ...],
+  "excluded": ["Dịch vụ không bao gồm 1", ...],
+  "seoTitle": "Tiêu đề SEO",
+  "seoDescription": "Mô tả SEO",
+  "imageSearchTerms": ["English keyword 1", "English keyword 2", ...]
 }
 
-Văn bản thô cần trích xuất:
+Văn bản thô:
 ---
 ${rawText}
 ---
@@ -511,7 +514,10 @@ ${rawText}
           console.log(`Attempting structured extraction with Gemini model: ${modelName}`);
           const model = genAI.getGenerativeModel({
             model: modelName,
-            generationConfig: { responseMimeType: 'application/json' },
+            generationConfig: { 
+              responseMimeType: 'application/json',
+              temperature: 0.1,
+            },
           });
           const result = await model.generateContent(prompt);
           textResponse = result.response.text();

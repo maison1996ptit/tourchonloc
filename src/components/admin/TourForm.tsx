@@ -113,6 +113,7 @@ export default function TourForm({ initialData, isEdit }: TourFormProps) {
           itinerary: itinerary,
           included: result.included || prev.included,
           excluded: result.excluded || prev.excluded,
+          priceByGroupSize: result.priceByGroupSize || prev.priceByGroupSize,
           seoTitle: result.seoTitle || prev.seoTitle,
           seoDescription: result.seoDescription || prev.seoDescription,
           featuredImage: result.featuredImage || prev.featuredImage || '',
