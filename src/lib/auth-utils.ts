@@ -65,5 +65,7 @@ export async function isAdmin() {
 
 export async function isEditor() {
   const session = await getAuthSession();
-  return session?.role === 'Admin' || session?.role === 'Editor';
+  if (!session || !session.role) return false;
+  const role = session.role.trim().toLowerCase();
+  return role === 'admin' || role === 'editor';
 }
