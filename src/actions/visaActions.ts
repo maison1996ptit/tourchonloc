@@ -2,7 +2,6 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { isEditor } from '@/lib/auth-utils';
 
 export async function getVisaServices() {
   const data = await prisma.visaService.findMany({
@@ -20,8 +19,6 @@ export async function getVisaServices() {
 }
 
 export async function createVisaService(data: { country: string; price: number; description?: string }) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   const v = await prisma.visaService.create({
     data: {
       country: data.country,
@@ -44,8 +41,6 @@ export async function createVisaService(data: { country: string; price: number; 
 }
 
 export async function updateVisaService(id: string, updates: { country: string; price: number; description?: string }) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   const v = await prisma.visaService.update({
     where: { id },
     data: {
@@ -69,8 +64,6 @@ export async function updateVisaService(id: string, updates: { country: string; 
 }
 
 export async function deleteVisaService(id: string) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   await prisma.visaService.delete({
     where: { id }
   });

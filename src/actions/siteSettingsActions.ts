@@ -3,7 +3,6 @@
 import { prisma } from '@/lib/prisma';
 import { SiteSettings } from '@/types/siteSettings';
 import { revalidatePath } from 'next/cache';
-import { isAdmin } from '@/lib/auth-utils';
 import { mockSiteSettings } from '@/data/siteSettings';
 
 export async function getSiteSettings() {
@@ -30,8 +29,6 @@ export async function getSiteSettings() {
 }
 
 export async function updateSiteSettings(updates: Partial<SiteSettings>) {
-  if (!(await isAdmin())) throw new Error('Unauthorized');
-
   const current = (await getSiteSettings()) || mockSiteSettings;
   const updated = { ...current, ...updates };
   

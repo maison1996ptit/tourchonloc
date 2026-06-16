@@ -3,7 +3,6 @@
 import { prisma } from '@/lib/prisma';
 import { ThemeSettings, ThemePreset } from '@/types/theme';
 import { revalidatePath } from 'next/cache';
-import { isAdmin } from '@/lib/auth-utils';
 
 export async function getThemeSettings() {
   const settings = await prisma.themeSettings.findUnique({
@@ -20,8 +19,6 @@ export async function getThemeSettings() {
 }
 
 export async function updateThemeSettings(updates: Partial<ThemeSettings>) {
-  if (!(await isAdmin())) throw new Error('Unauthorized');
-
   const current = await getThemeSettings();
   if (!current) throw new Error('Theme settings not found');
 

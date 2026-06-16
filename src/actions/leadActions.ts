@@ -4,12 +4,9 @@ import { prisma } from '@/lib/prisma';
 import { Lead, LeadStatus, LeadSource } from '@/types/lead';
 import { Tour } from '@/types/tour';
 import { revalidatePath } from 'next/cache';
-import { isEditor } from '@/lib/auth-utils';
 import { sendLeadNotificationEmail, sendMarketingEmail } from '@/lib/mail';
 
 export async function getLeads() {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   const data = await prisma.lead.findMany({
     orderBy: { createdAt: 'desc' }
   });
@@ -71,8 +68,6 @@ export async function createLead(lead: Omit<Lead, 'id' | 'createdAt' | 'updatedA
 }
 
 export async function updateLead(id: string, updates: Partial<Lead>) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   const allowedUpdates: any = {};
   if (updates.fullName !== undefined) allowedUpdates.fullName = updates.fullName;
   if (updates.email !== undefined) allowedUpdates.email = updates.email;
@@ -104,8 +99,6 @@ export async function updateLead(id: string, updates: Partial<Lead>) {
 }
 
 export async function bulkCreateLeads(leads: any[]) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   const result = await prisma.lead.createMany({
     data: leads.map(l => ({
       fullName: l.fullName,
@@ -125,8 +118,6 @@ export async function bulkCreateLeads(leads: any[]) {
 }
 
 export async function deleteLead(id: string) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   try {
     await prisma.lead.delete({
       where: { id }
@@ -144,8 +135,6 @@ export async function sendMarketingCampaignAction(
   body: string,
   tourIds: string[]
 ) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   // Fetch leads and selected tours
   const [selectedLeads, selectedTours] = await Promise.all([
     prisma.lead.findMany({

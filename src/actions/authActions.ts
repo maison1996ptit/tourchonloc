@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { User, UserRole } from '@/types/user';
 import { revalidatePath } from 'next/cache';
-import { comparePassword, signToken, verifyToken, isEditor, isAdmin } from '@/lib/auth-utils';
+import { comparePassword, signToken, verifyToken } from '@/lib/auth-utils';
 import { cookies } from 'next/headers';
 
 export async function loginAction(email: string, password: string) {
@@ -81,10 +81,6 @@ export async function getCurrentUserAction(token?: string) {
 }
 
 export async function getUsers() {
-  if (!(await isAdmin())) {
-    throw new Error('Unauthorized');
-  }
-
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
     select: {

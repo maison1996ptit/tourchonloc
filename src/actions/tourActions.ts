@@ -3,7 +3,6 @@
 import { prisma } from '@/lib/prisma';
 import { Tour, TourStatus } from '@/types/tour';
 import { revalidatePath } from 'next/cache';
-import { isEditor } from '@/lib/auth-utils';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function getTours() {
@@ -48,8 +47,6 @@ export async function getTourBySlug(slug: string) {
 }
 
 export async function createTour(tour: Omit<Tour, 'id' | 'createdAt' | 'updatedAt'>) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   // Explicitly map fields to prevent mass assignment
   const t = await prisma.tour.create({
     data: {
@@ -99,8 +96,6 @@ export async function createTour(tour: Omit<Tour, 'id' | 'createdAt' | 'updatedA
 }
 
 export async function updateTour(id: string, updates: Partial<Tour>) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   // Explicitly map allowed fields
   const allowedUpdates: any = {};
   if (updates.title !== undefined) allowedUpdates.title = updates.title;
@@ -152,8 +147,6 @@ export async function updateTour(id: string, updates: Partial<Tour>) {
 }
 
 export async function deleteTour(id: string) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-  
   try {
     const tour = await prisma.tour.findUnique({
       where: { id },
@@ -177,8 +170,6 @@ export async function deleteTour(id: string) {
 }
 
 export async function bulkCreateTours(newTours: Omit<Tour, 'id' | 'createdAt' | 'updatedAt'>[]) {
-  if (!(await isEditor())) throw new Error('Unauthorized');
-
   const createdTours = await Promise.all(
     newTours.map(tour => 
       prisma.tour.create({
@@ -361,12 +352,6 @@ async function searchMultipleLandmarkImages(
 
 export async function parseTourPDF(formData: FormData): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const isAuthorized = await isEditor();
-    if (!isAuthorized) {
-      console.error("[Auth Check] Unauthorized access attempt to parseTourPDF");
-      return { success: false, error: 'Bạn không có quyền thực hiện hành động này.' };
-    }
-
     const file = formData.get('file') as File;
     if (!file) {
       return { success: false, error: 'Không tìm thấy tệp tải lên' };
