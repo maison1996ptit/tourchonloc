@@ -33,7 +33,7 @@ export default function AiAssistantWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'model',
-      parts: 'Dạ em chào Anh/Chị ạ! Chúc Anh/Chị một ngày tốt lành! 🌸 Em là Vy Vy - chuyên viên tư vấn du lịch từ TravelApp. Chuyến đi sắp tới mình đã dự định đi đâu và đi mấy người chưa ạ? Hãy nói cho em biết để em hỗ trợ tư vấn và thiết kế lịch trình ưng ý nhất cho mình nhé! 🌏✈️',
+      parts: 'Dạ em chào Anh/Chị ạ! Chúc Anh/Chị một ngày tốt lành! 🌸 Em là Vy Vy - chuyên viên tư vấn du lịch từ Tour Chọn Lọc. Chuyến đi sắp tới mình đã dự định đi đâu và đi mấy người chưa ạ? Hãy nói cho em biết để em hỗ trợ tư vấn và thiết kế lịch trình ưng ý nhất cho mình nhé! 🌏✈️',
     },
   ]);
   const [input, setInput] = useState('');
@@ -182,7 +182,7 @@ export default function AiAssistantWidget() {
           <div className={styles.chatHeader}>
             <div className={styles.headerAvatar}>🤖</div>
             <div className={styles.headerInfo}>
-              <h4>Trợ Lý Du Lịch TravelApp</h4>
+              <h4>Trợ Lý Du Lịch Tour Chọn Lọc</h4>
               <p>🟢 Đang hoạt động • AI tư vấn</p>
             </div>
             <button className={styles.headerCloseBtn} onClick={() => setIsOpen(false)}>

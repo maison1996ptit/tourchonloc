@@ -12,7 +12,7 @@ const caveat = Caveat({ subsets: ["latin"], variable: "--font-accent", weight: [
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: "TravelApp - Đại lý Du lịch Sang trọng",
+  title: "Tour Chọn Lọc - Đại lý du lịch sang trọng",
   description: "Trải nghiệm thế giới theo phong cách riêng với các tour du lịch bản sắc của chúng tôi.",
 };
 
