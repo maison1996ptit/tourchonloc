@@ -20,7 +20,7 @@ export const mockSiteSettings: SiteSettings = {
      zalo: 'https://zalo.me/84372521237',
     // instagram: 'https://instagram.com/luxurytravel'
   },
-  seoDefaultTitle: 'Tour Chọn Lọc - Trải nghiệm du lịch đích thực',
+  seoDefaultTitle: 'Tour Chọn Lọc - Đại lý du lịch sang trọng',
   seoDefaultDescription: 'Khám phá những trải nghiệm du lịch đẳng cấp và chân thực cùng đội ngũ chuyên gia của chúng tôi.',
   affiliateGear: [
     {

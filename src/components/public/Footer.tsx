@@ -36,7 +36,7 @@ export default function Footer() {
           <div>
             <div className={styles.footerLogoContainer}>
               <Image 
-                src="/logo.svg" 
+                src="/logo.png" 
                 alt={settings.websiteName} 
                 width={50} 
                 height={50} 
