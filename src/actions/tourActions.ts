@@ -370,10 +370,11 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    // Chuyển đổi thành Uint8Array vì pdf.js (bên dưới pdf-parse) yêu cầu kiểu dữ liệu này trên một số môi trường
+    const uint8Array = new Uint8Array(arrayBuffer);
 
     // 3. Kiểm tra Magic Bytes đầu tệp tin xem có đúng định dạng PDF không (%PDF ở dạng Hex: 25 50 44 46)
-    if (buffer.length < 4 || buffer[0] !== 0x25 || buffer[1] !== 0x50 || buffer[2] !== 0x44 || buffer[3] !== 0x46) {
+    if (uint8Array.length < 4 || uint8Array[0] !== 0x25 || uint8Array[1] !== 0x50 || uint8Array[2] !== 0x44 || uint8Array[3] !== 0x46) {
       return { success: false, error: 'Nội dung tệp tin tải lên không đúng cấu trúc hoặc đã bị giả mạo cấu trúc định dạng PDF.' };
     }
 
@@ -406,15 +407,22 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
 
       try {
         // Cố gắng gọi như một hàm chuẩn
-        const pdfData = await pdfParseFn(buffer, options);
+        const pdfData = await pdfParseFn(uint8Array, options);
         rawText = pdfData.text;
       } catch (funcErr) {
         // Nếu lỗi "Class constructors cannot be invoked without 'new'", gọi như một class
-        const parser = new pdfParseFn(buffer, options);
+        // Lưu ý: class version của pdf-parse v2 thường yêu cầu object { data: uint8Array }
+        let parser;
+        try {
+           parser = new pdfParseFn({ data: uint8Array }, options);
+        } catch (e) {
+           parser = new pdfParseFn(uint8Array, options);
+        }
+        
         if (parser && typeof parser.getText === 'function') {
           const result = await parser.getText();
           rawText = result.text;
-        } else if (parser.text) {
+        } else if (parser && parser.text) {
           rawText = parser.text;
         } else {
            throw funcErr; // Ném lại lỗi ban đầu nếu fallback không có dữ liệu
@@ -426,7 +434,7 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
       }
     } catch (err) {
       console.error('Error parsing PDF text:', err);
-      return { success: false, error: 'Không thể đọc nội dung file PDF. Vui lòng kiểm tra định dạng file.' };
+      return { success: false, error: 'Không thể đọc nội dung file PDF. Chi tiết lỗi: ' + (err instanceof Error ? err.message : String(err)) };
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
