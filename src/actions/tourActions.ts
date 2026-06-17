@@ -401,16 +401,24 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
       
       // Sử dụng chế độ trích xuất văn bản thuần túy (bỏ qua render đồ họa để tránh lỗi Canvas trên Ubuntu)
       const options = {
-        pagerender: function() { return ''; } // Vô hiệu hóa việc render trang đồ họa
+        pagerender: function(pageData: any) { return pageData.getTextContent().then((textContent: any) => { let lastY, text = ''; for (let item of textContent.items) { if (lastY == item.transform[5] || !lastY) { text += item.str; } else { text += '\n' + item.str; } lastY = item.transform[5]; } return text; }); }
       };
 
-      const pdfData = await pdfParseFn(buffer, options);
-      rawText = pdfData.text;
-
-      if (!rawText || rawText.trim().length === 0) {
-        // Fallback: Thử lại lần nữa không dùng options nếu lần đầu thất bại
-        const fallbackData = await pdfParseFn(buffer);
-        rawText = fallbackData.text;
+      try {
+        // Cố gắng gọi như một hàm chuẩn
+        const pdfData = await pdfParseFn(buffer, options);
+        rawText = pdfData.text;
+      } catch (funcErr) {
+        // Nếu lỗi "Class constructors cannot be invoked without 'new'", gọi như một class
+        const parser = new pdfParseFn(buffer, options);
+        if (parser && typeof parser.getText === 'function') {
+          const result = await parser.getText();
+          rawText = result.text;
+        } else if (parser.text) {
+          rawText = parser.text;
+        } else {
+           throw funcErr; // Ném lại lỗi ban đầu nếu fallback không có dữ liệu
+        }
       }
 
       if (!rawText || rawText.trim().length === 0) {
