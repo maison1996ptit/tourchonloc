@@ -370,72 +370,8 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    // Chuyển đổi thành Uint8Array vì pdf.js (bên dưới pdf-parse) yêu cầu kiểu dữ liệu này trên một số môi trường
-    const uint8Array = new Uint8Array(arrayBuffer);
-
-    // 3. Kiểm tra Magic Bytes đầu tệp tin xem có đúng định dạng PDF không (%PDF ở dạng Hex: 25 50 44 46)
-    if (uint8Array.length < 4 || uint8Array[0] !== 0x25 || uint8Array[1] !== 0x50 || uint8Array[2] !== 0x44 || uint8Array[3] !== 0x46) {
-      return { success: false, error: 'Nội dung tệp tin tải lên không đúng cấu trúc hoặc đã bị giả mạo cấu trúc định dạng PDF.' };
-    }
-
-    // Polyfill DOMMatrix for pdfjs-dist in Node environment
-    if (typeof globalThis.DOMMatrix === 'undefined') {
-      // @ts-ignore
-      globalThis.DOMMatrix = class DOMMatrix {
-        a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
-        static fromMatrix() { return new DOMMatrix(); }
-        static fromFloat32Array() { return new DOMMatrix(); }
-        static fromFloat64Array() { return new DOMMatrix(); }
-        translate() { return this; }
-        scale() { return this; }
-        multiply() { return this; }
-        inverse() { return this; }
-        transformPoint(p: any) { return p; }
-      };
-    }
-
-    // Extract PDF text
-    let rawText = '';
-    try {
-      const pdfModule = require('pdf-parse');
-      const pdfParseFn = typeof pdfModule === 'function' ? pdfModule : (pdfModule.PDFParse || pdfModule.default);
-      
-      // Sử dụng chế độ trích xuất văn bản thuần túy (bỏ qua render đồ họa để tránh lỗi Canvas trên Ubuntu)
-      const options = {
-        pagerender: function(pageData: any) { return pageData.getTextContent().then((textContent: any) => { let lastY, text = ''; for (let item of textContent.items) { if (lastY == item.transform[5] || !lastY) { text += item.str; } else { text += '\n' + item.str; } lastY = item.transform[5]; } return text; }); }
-      };
-
-      try {
-        // Cố gắng gọi như một hàm chuẩn
-        const pdfData = await pdfParseFn(uint8Array, options);
-        rawText = pdfData.text;
-      } catch (funcErr) {
-        // Nếu lỗi "Class constructors cannot be invoked without 'new'", gọi như một class
-        // Lưu ý: class version của pdf-parse v2 thường yêu cầu object { data: uint8Array }
-        let parser;
-        try {
-           parser = new pdfParseFn({ data: uint8Array }, options);
-        } catch (e) {
-           parser = new pdfParseFn(uint8Array, options);
-        }
-        
-        if (parser && typeof parser.getText === 'function') {
-          const result = await parser.getText();
-          rawText = result.text;
-        } else if (parser && parser.text) {
-          rawText = parser.text;
-        } else {
-           throw funcErr; // Ném lại lỗi ban đầu nếu fallback không có dữ liệu
-        }
-      }
-
-      if (!rawText || rawText.trim().length === 0) {
-        return { success: false, error: 'Không thể trích xuất văn bản từ file PDF. Vui lòng kiểm tra xem file PDF có lớp văn bản (OCR) hay không.' };
-      }
-    } catch (err) {
-      console.error('Error parsing PDF text:', err);
-      return { success: false, error: 'Không thể đọc nội dung file PDF. Chi tiết lỗi: ' + (err instanceof Error ? err.message : String(err)) };
-    }
+    const buffer = Buffer.from(arrayBuffer);
+    const base64Data = buffer.toString('base64');
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -443,19 +379,20 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
     }
 
     if (/[^\x00-\x7F]/.test(apiKey)) {
-      console.error("LỖI CẤU HÌNH: GEMINI_API_KEY trên server chứa ký tự tiếng Việt (có thể do bật Unikey/EVKey khi paste). Vui lòng tắt bộ gõ tiếng Việt và dán lại API key vào file .env.");
-      return { success: false, error: 'Cấu hình GEMINI_API_KEY trên máy chủ live chứa ký tự tiếng Việt không hợp lệ (ví dụ chữ "ử" do lỗi Telex paste). Vui lòng kiểm tra lại file .env.' };
+      console.error("LỖI CẤU HÌNH: GEMINI_API_KEY chứa ký tự không hợp lệ.");
+      return { success: false, error: 'Cấu hình GEMINI_API_KEY chứa ký tự không hợp lệ. Vui lòng kiểm tra lại file .env.' };
     }
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const modelsToTry = ['gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+      // Sử dụng model mới nhất hỗ trợ đọc PDF tốt nhất
+      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-pro'];
       let lastError: Error | null = null;
       let textResponse = '';
 
       const prompt = `
-Bạn là một trợ lý thông minh chuyên nghiệp chuyên chuyển đổi lịch trình du lịch từ văn bản thô (trích xuất từ PDF) sang JSON.
-Hãy phân tích kỹ văn bản dưới đây và trích xuất thông tin một cách chính xác nhất có thể.
+Bạn là một trợ lý thông minh chuyên nghiệp chuyên chuyển đổi lịch trình du lịch từ file PDF sang JSON.
+Hãy đọc kỹ toàn bộ nội dung file PDF đính kèm và trích xuất thông tin một cách chính xác nhất có thể.
 
 Yêu cầu đặc biệt:
 1. departureDates: Hãy tìm tất cả các ngày khởi hành trong bảng lịch khởi hành hoặc phần ghi chú. Trích xuất TẤT CẢ các ngày có thể tìm thấy. Chuyển đổi về định dạng DD/MM/YYYY. Ví dụ: ["22/05/2026", "12/06/2026"].
@@ -465,7 +402,7 @@ Yêu cầu đặc biệt:
 5. itinerary: Trích xuất tiêu đề ngày và danh sách các hoạt động chi tiết cho mỗi ngày.
 6. imageSearchTerms: Tạo danh sách 10-15 từ khóa tiếng Anh cực kỳ chính xác. Quan trọng: Phải bao quát TẤT CẢ các thành phố và địa danh lớn xuất hiện trong lịch trình (ví dụ: mỗi ngày chọn ra 1-2 địa điểm đặc sắc nhất). Mỗi từ khóa phải bao gồm tên thành phố để tìm kiếm chính xác, ví dụ: ["Victoria Peak Hong Kong", "Repulse Bay Hong Kong", "Shenzhen Window of the World", "Guangzhou Yuexiu Park"].
 
-Cấu trúc JSON trả về:
+Cấu trúc JSON trả về BẮT BUỘC:
 {
   "title": "Tên tour đầy đủ",
   "category": "Danh mục khu vực (Đông Á, Châu Âu...)",
@@ -494,16 +431,11 @@ Cấu trúc JSON trả về:
   "seoDescription": "Mô tả SEO",
   "imageSearchTerms": ["English keyword 1", "English keyword 2", ...]
 }
-
-Văn bản thô:
----
-${rawText}
----
       `;
 
       for (const modelName of modelsToTry) {
         try {
-          console.log(`Attempting structured extraction with Gemini model: ${modelName}`);
+          console.log(`Attempting PDF extraction with Gemini model: ${modelName}`);
           const model = genAI.getGenerativeModel({
             model: modelName,
             generationConfig: { 
@@ -511,7 +443,18 @@ ${rawText}
               temperature: 0.1,
             },
           });
-          const result = await model.generateContent(prompt);
+          
+          // Truyền trực tiếp Base64 của PDF vào cho AI tự đọc thay vì dùng thư viện local
+          const result = await model.generateContent([
+            {
+              inlineData: {
+                data: base64Data,
+                mimeType: "application/pdf"
+              }
+            },
+            prompt
+          ]);
+          
           textResponse = result.response.text();
           if (textResponse) {
             console.log(`Successfully extracted content using Gemini model: ${modelName}`);
@@ -524,7 +467,7 @@ ${rawText}
       }
 
       if (!textResponse) {
-        return { success: false, error: lastError?.message || 'Không nhận được phản hồi từ AI' };
+        return { success: false, error: lastError?.message || 'AI không thể đọc được file PDF này.' };
       }
 
       let cleanText = textResponse.trim();
