@@ -63,7 +63,12 @@ export default function Footer() {
             </ul>
             <div className={styles.socials}>
               {settings.socialLinks.zalo && (
-                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer">Zalo</a>
+                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#0068FF', color: 'white', padding: '8px 16px', borderRadius: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.5 11.5C21.5 16.1944 17.2464 20 12 20C10.7431 20 9.54413 19.7423 8.44857 19.2785C8.01633 19.0955 7.5146 19.1672 7.12643 19.4678L3.89973 21.965C3.39697 22.3541 2.6685 21.9542 2.7486 21.3283L3.1979 17.8184C3.27878 17.1866 2.97334 16.5683 2.45785 16.177C1.52044 15.4652 0.5 13.5654 0.5 11.5C0.5 6.80558 4.75355 3 10 3C15.2464 3 19.5 6.80558 19.5 11.5Z" fill="white"/>
+                  </svg>
+                  Zalo
+                </a>
               )}
             </div>
           </div>
