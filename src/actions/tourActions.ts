@@ -351,6 +351,7 @@ async function searchMultipleLandmarkImages(
 }
 
 export async function parseTourPDF(formData: FormData): Promise<{ success: boolean; data?: any; error?: string }> {
+  console.log(">>> CHECK_VERSION: HIEN_TAI_LA_CODE_MOI_KHONG_AUTH <<<");
   try {
     const file = formData.get('file') as File;
     if (!file) {
@@ -397,35 +398,23 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
     try {
       const pdfModule = require('pdf-parse');
       const pdfParseFn = typeof pdfModule === 'function' ? pdfModule : (pdfModule.PDFParse || pdfModule.default);
-      if (typeof pdfParseFn !== 'function') {
-        return { success: false, error: 'pdf-parse library export is not a function' };
-      }
       
-      try {
-        // Cách dùng 1: Thư viện pdf-parse v2 (class-based)
-        const parser = new pdfParseFn({ data: buffer });
-        if (parser && typeof parser.getText === 'function') {
-          const result = await parser.getText();
-          rawText = result.text;
-        } else {
-          // Fallback nếu không khởi tạo đúng class
-          const pdfData = await pdfParseFn(buffer);
-          rawText = pdfData.text;
-        }
-      } catch (constructErr) {
-        // Cách dùng 2: Thư viện pdf-parse v1 (legacy function)
-        try {
-          const pdfData = await pdfParseFn(buffer);
-          rawText = pdfData.text;
-        } catch (legacyErr) {
-          // Fallback cuối cùng
-          const pdfData = await new pdfParseFn(buffer);
-          rawText = pdfData.text;
-        }
+      // Sử dụng chế độ trích xuất văn bản thuần túy (bỏ qua render đồ họa để tránh lỗi Canvas trên Ubuntu)
+      const options = {
+        pagerender: function() { return ''; } // Vô hiệu hóa việc render trang đồ họa
+      };
+
+      const pdfData = await pdfParseFn(buffer, options);
+      rawText = pdfData.text;
+
+      if (!rawText || rawText.trim().length === 0) {
+        // Fallback: Thử lại lần nữa không dùng options nếu lần đầu thất bại
+        const fallbackData = await pdfParseFn(buffer);
+        rawText = fallbackData.text;
       }
 
-      if (!rawText) {
-        return { success: false, error: 'Không thể trích xuất văn bản từ file PDF (nội dung trống).' };
+      if (!rawText || rawText.trim().length === 0) {
+        return { success: false, error: 'Không thể trích xuất văn bản từ file PDF. Vui lòng kiểm tra xem file PDF có lớp văn bản (OCR) hay không.' };
       }
     } catch (err) {
       console.error('Error parsing PDF text:', err);

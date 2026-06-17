@@ -58,14 +58,4 @@ export async function getAuthSession() {
   };
 }
 
-export async function isAdmin() {
-  const session = await getAuthSession();
-  return session?.role === 'Admin';
-}
-
-export async function isEditor() {
-  const session = await getAuthSession();
-  if (!session || !session.role) return false;
-  const role = session.role.trim().toLowerCase();
-  return role === 'admin' || role === 'editor';
-}
+// isAdmin and isEditor removed by user request to bypass all auth
