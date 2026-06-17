@@ -12,7 +12,7 @@ async function main() {
       where: { id: 'main_settings' },
       data: {
         websiteName: 'Tour Chọn Lọc',
-        seoDefaultTitle: 'Tour Chọn Lọc - Đại lý du lịch sang trọng',
+        seoDefaultTitle: 'Tour Chọn Lọc - Luôn mang lại giá trị cốt lõi',
         contactInfo: {
           phone: ['+84 372 521 237'],
           email: ['fit.saletourchonloc@gmail.com'],
