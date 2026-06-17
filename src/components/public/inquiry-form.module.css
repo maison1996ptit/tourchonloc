@@ -27,6 +27,8 @@
   font-size: 1rem;
   transition: border-color 0.2s;
   color: var(--text-main);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .field input:focus, .field textarea:focus {

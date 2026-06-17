@@ -1,8 +1,8 @@
 import { SiteSettings } from '@/types/siteSettings';
 
 export const mockSiteSettings: SiteSettings = {
-  websiteName: 'Tour chọn lọc',
-  tagline: 'Discover the World in Style',
+  websiteName: 'Tour Chọn Lọc',
+  tagline: 'Khám phá thế giới theo cách của bạn',
   heroHeadline: 'Experience Authentic Travel Like Never Before',
   heroSubtitle: 'Tailor-made journeys for the discerning traveler.',
   heroImage: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=2070',
@@ -10,18 +10,18 @@ export const mockSiteSettings: SiteSettings = {
     text: 'Plan Your Trip',
     link: '/customize-trip'
   },
-  footerDescription: 'We specialize in providing unique and luxury travel experiences across South East Asia.',
+  footerDescription: 'Chúng tôi chuyên cung cấp các trải nghiệm du lịch độc đáo và đẳng cấp.',
   contactInfo: {
     phone: ['+84 372 521 237'],
     email: ['fit.saletourchonloc@gmail.com'],
-    officeAddresses: ['535/25 Pham Van Dong, Binh Loi Trung , Ho Chi Minh City, Vietnam']
+    officeAddresses: ['535/25 Pham Van Dong Street, Binh Loi Trung Ward, Ho Chi Minh City, Vietnam']
   },
   socialLinks: {
      zalo: 'https://zalo.me/84372521237',
     // instagram: 'https://instagram.com/luxurytravel'
   },
-  seoDefaultTitle: 'Luxury Travel Agency - Authentic South East Asia Tours',
-  seoDefaultDescription: 'Discover luxury and authentic travel experiences in Vietnam, Thailand, and Bali with our expert local guides.',
+  seoDefaultTitle: 'Tour Chọn Lọc - Trải nghiệm du lịch đích thực',
+  seoDefaultDescription: 'Khám phá những trải nghiệm du lịch đẳng cấp và chân thực cùng đội ngũ chuyên gia của chúng tôi.',
   affiliateGear: [
     {
       title: 'Premium Travel Pillow',

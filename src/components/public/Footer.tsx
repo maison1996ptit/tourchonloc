@@ -36,7 +36,7 @@ export default function Footer() {
           <div>
             <div className={styles.footerLogoContainer}>
               <Image 
-                src="/logo.png" 
+                src="/logo.svg" 
                 alt={settings.websiteName} 
                 width={50} 
                 height={50} 
@@ -62,14 +62,8 @@ export default function Footer() {
               ))}
             </ul>
             <div className={styles.socials}>
-              {settings.socialLinks.facebook && (
-                <a href={settings.socialLinks.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
-              )}
-              {settings.socialLinks.instagram && (
-                <a href={settings.socialLinks.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
-              )}
-              {settings.socialLinks.twitter && (
-                <a href={settings.socialLinks.twitter} target="_blank" rel="noopener noreferrer">Twitter</a>
+              {settings.socialLinks.zalo && (
+                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer">Zalo</a>
               )}
             </div>
           </div>
