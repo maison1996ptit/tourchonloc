@@ -35,12 +35,11 @@ export default function Footer() {
         <div className={styles.footerGrid}>
           <div>
             <div className={styles.footerLogoContainer}>
-              <Image 
+              <img 
                 src="/logo.png" 
                 alt={settings.websiteName} 
-                width={50} 
-                height={50} 
                 className={styles.footerLogo}
+                style={{ width: '50px', height: '50px', objectFit: 'contain' }}
               />
               <h3 style={{ margin: 0 }}>{settings.websiteName}</h3>
             </div>

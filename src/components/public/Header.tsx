@@ -38,14 +38,11 @@ export default function Header() {
     <header className={styles.header}>
       <div className={styles.headerContainer}>
         <Link href="/" className={styles.logo}>
-          <Image 
+          <img 
             src="/logo.png" 
-            alt={settings?.websiteName || 'TravelApp Logo'} 
-            width={120} 
-            height={120} 
+            alt={settings?.websiteName || 'Tour Chọn Lọc'} 
             className={styles.logoImage}
             style={{ width: 'auto', height: 'auto' }}
-            priority
           />
         </Link>
         <div className={styles.navContainer}>
