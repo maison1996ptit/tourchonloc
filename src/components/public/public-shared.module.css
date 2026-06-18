@@ -37,22 +37,11 @@
   width: 176px !important;  /* Reduced by another 10% (196px * 0.9 = 176px) */
   object-fit: contain;
   z-index: 10;
-  animation: logoFloat 4s ease-in-out infinite;
   transition: transform 0.3s ease;
-}
-
-@keyframes logoFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
 }
 
 .logo:hover .logoImage {
   transform: scale(1.05);
-  animation-play-state: paused; /* Pause floating on hover for better interaction */
 }
 
 .footerLogoContainer {
