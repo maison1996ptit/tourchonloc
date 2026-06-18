@@ -218,6 +218,28 @@ export default function SiteSettingsPage() {
               setSettings({...settings, contactInfo: {...settings.contactInfo, phone: newPhones}});
             }} />
           </div>
+          <div className={styles.field}>
+            <label>Office Address</label>
+            <textarea value={settings.contactInfo.officeAddresses?.[0] || ''} onChange={(e) => {
+              const newAddrs = [...(settings.contactInfo.officeAddresses || [])];
+              newAddrs[0] = e.target.value;
+              setSettings({...settings, contactInfo: {...settings.contactInfo, officeAddresses: newAddrs}});
+            }} rows={2} />
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h3>Footer & Social Links</h3>
+          <div className={styles.field}>
+            <label>Footer Description</label>
+            <textarea name="footerDescription" value={settings.footerDescription || ''} onChange={handleInputChange} rows={3} />
+          </div>
+          <div className={styles.field}>
+            <label>Zalo Link</label>
+            <input value={settings.socialLinks?.zalo || ''} onChange={(e) => {
+              setSettings({...settings, socialLinks: {...settings.socialLinks, zalo: e.target.value}});
+            }} placeholder="https://zalo.me/..." />
+          </div>
         </section>
 
         <section className={styles.section}>
