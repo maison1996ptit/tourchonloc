@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { askAiAssistant } from '@/actions/aiActions';
 import { createLead } from '@/actions/leadActions';
 import styles from './AiAssistant.module.css';
@@ -172,7 +173,7 @@ export default function AiAssistantWidget() {
           <span className={styles.closeIcon}>×</span>
         ) : (
           <span className={styles.chatIcon} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
-            <Image src="/chatbotLogo.png" alt="Chatbot" width={60} height={60} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+            <img src="/chatbotLogo.png" alt="Chatbot" width="60" height="60" style={{ borderRadius: '50%', objectFit: 'cover' }} />
           </span>
         )}
       </button>
