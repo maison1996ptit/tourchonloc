@@ -63,8 +63,8 @@ export default function Footer() {
             </ul>
             <div className={styles.socials}>
               {settings.socialLinks.zalo && (
-                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ color: '#0068FF', textDecoration: 'underline', fontWeight: 'bold' }}>
-                  Zalo
+                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+                  <img src="/zalo.png" alt="Zalo" width="32" height="32" style={{ display: 'block' }} />
                 </a>
               )}
             </div>
