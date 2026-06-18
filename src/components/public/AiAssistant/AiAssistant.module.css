@@ -47,6 +47,14 @@
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
 }
 
+.chatbotLogoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
 /* Chat Window Box */
 .chatWindow {
   position: absolute;

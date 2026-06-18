@@ -172,8 +172,8 @@ export default function AiAssistantWidget() {
         {isOpen ? (
           <span className={styles.closeIcon}>×</span>
         ) : (
-          <span className={styles.chatIcon} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
-            <img src="/chatbotLogo.png" alt="Chatbot" width="60" height="60" style={{ borderRadius: '50%', objectFit: 'cover' }} />
+          <span className={styles.chatIcon} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', overflow: 'hidden', borderRadius: '50%' }}>
+            <img src="/chatbotLogo.png" alt="Chatbot" className={styles.chatbotLogoImg} />
           </span>
         )}
       </button>
