@@ -229,7 +229,7 @@ async function main() {
     { label: 'Trang chủ', url: '/', order: 1 },
     { label: 'Tour du lịch', url: '/tours', order: 2 },
     { label: 'Dịch vụ Visa', url: '/visa', order: 3 },
-    { label: 'Blog', url: '/blogs', order: 4 },
+    { label: 'Cẩm Nang', url: '/blogs', order: 4 },
     { label: 'Về chúng tôi', url: '/about', order: 5 }
   ];
   for (const item of headerMenu) {
