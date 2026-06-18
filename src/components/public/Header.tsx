@@ -39,7 +39,7 @@ export default function Header() {
       <div className={styles.headerContainer}>
         <Link href="/" className={styles.logo}>
           <Image 
-            src="/logo.svg" 
+            src="/logo.png" 
             alt={settings?.websiteName || 'TravelApp Logo'} 
             width={120} 
             height={120} 
