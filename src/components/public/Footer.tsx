@@ -63,10 +63,8 @@ export default function Footer() {
             </ul>
             <div className={styles.socials}>
               {settings.socialLinks.zalo && (
-                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#0068FF', color: 'white', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'all 0.3s ease', boxShadow: '0 4px 10px rgba(0, 104, 255, 0.2)' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21.5 11.5C21.5 16.1944 17.2464 20 12 20C10.7431 20 9.54413 19.7423 8.44857 19.2785C8.01633 19.0955 7.5146 19.1672 7.12643 19.4678L3.89973 21.965C3.39697 22.3541 2.6685 21.9542 2.7486 21.3283L3.1979 17.8184C3.27878 17.1866 2.97334 16.5683 2.45785 16.177C1.52044 15.4652 0.5 13.5654 0.5 11.5C0.5 6.80558 4.75355 3 10 3C15.2464 3 19.5 6.80558 19.5 11.5Z" fill="white"/>
-                  </svg>
+                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px', background: 'white', color: '#0068FF', padding: '10px 24px', borderRadius: '24px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px', transition: 'all 0.3s ease', border: '1px solid #0068FF', boxShadow: '0 4px 6px rgba(0, 104, 255, 0.1)' }}>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a1/Zalo_Logo.svg" alt="Zalo" width="30" height="30" style={{ display: 'block' }} />
                   <span>Chat Zalo</span>
                 </a>
               )}
