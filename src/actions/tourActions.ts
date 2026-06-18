@@ -385,8 +385,12 @@ export async function parseTourPDF(formData: FormData): Promise<{ success: boole
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Sử dụng model mới nhất hỗ trợ đọc PDF tốt nhất
-      const modelsToTry = ['gemini-1.5-flash-latest', 'gemini-1.5-pro-latest', 'gemini-1.0-pro'];
+      // Triển khai logic Fallback như một Senior: Ưu tiên model thông minh nhất (Pro), nếu sập/chậm thì lùi về Flash, và cuối cùng là bản ổn định (stable).
+      const modelsToTry = [
+        'gemini-3.5-flash',
+        'gemini-2.5-pro',
+        'gemini-2.5-flash'
+      ];
       let lastError: Error | null = null;
       let textResponse = '';
 
