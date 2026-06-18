@@ -46,11 +46,11 @@ export async function askAiAssistant(history: ChatMessage[], message: string): P
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Triển khai logic Fallback: Ưu tiên model thông minh nhất (Pro), nếu sập/chậm thì lùi về Flash, và cuối cùng là bản ổn định (stable).
+    // Sử dụng đúng các model mà API Key của người dùng đang được hỗ trợ
     const modelsToTry = [
-      'gemini-1.5-pro-latest',    // 1. Thông minh nhất để tư vấn khách hàng
-      'gemini-1.5-flash-latest',  // 2. Fallback: Tốc độ cao, xử lý dự phòng
-      'gemini-1.0-pro'            // 3. Bản cũ ổn định
+      'gemini-3.5-flash',
+      'gemini-2.5-pro',
+      'gemini-2.5-flash'
     ];
     let textResponse = '';
     let lastError = null;
