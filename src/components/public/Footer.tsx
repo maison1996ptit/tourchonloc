@@ -63,11 +63,12 @@ export default function Footer() {
             </ul>
             <div className={styles.socials}>
               {settings.socialLinks.zalo && (
-                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#0068FF', color: 'white', padding: '8px 16px', borderRadius: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21.5 11.5C21.5 16.1944 17.2464 20 12 20C10.7431 20 9.54413 19.7423 8.44857 19.2785C8.01633 19.0955 7.5146 19.1672 7.12643 19.4678L3.89973 21.965C3.39697 22.3541 2.6685 21.9542 2.7486 21.3283L3.1979 17.8184C3.27878 17.1866 2.97334 16.5683 2.45785 16.177C1.52044 15.4652 0.5 13.5654 0.5 11.5C0.5 6.80558 4.75355 3 10 3C15.2464 3 19.5 6.80558 19.5 11.5Z" fill="white"/>
+                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#0068FF', color: 'white', padding: '10px 20px', borderRadius: '24px', textDecoration: 'none', fontWeight: '600', fontSize: '15px', transition: 'all 0.3s ease', boxShadow: '0 4px 10px rgba(0, 104, 255, 0.2)' }}>
+                  <svg width="22" height="22" viewBox="0 0 460.1 436.01" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+                    <path d="M460.1 202.04c0-111.45-103.01-202.04-230.05-202.04C102.93 0 0 90.59 0 202.04c0 62.77 32.55 119.5 86.6 156.97 1.55 1.09 2.58 2.8 2.76 4.7l4.02 44.29c1.65 18.06 20.88 28.53 36.87 20.08l52.12-27.68c1.64-.87 3.51-.95 5.2-.23 13.56 5.8 28 8.87 42.48 8.87 127.04 0 230.05-90.59 230.05-202.04z" fill="#0068FF"/>
+                    <path d="M127.52 144.38h32.1v96.65c0 14.88-12.06 26.94-26.94 26.94h-10.42c-12.82 0-23.22-10.4-23.22-23.22V144.38h28.48zm120.35 120.47c-26.65 0-48.24-21.6-48.24-48.24v-.48c0-26.65 21.6-48.24 48.24-48.24 26.65 0 48.24 21.6 48.24 48.24v.48c0 26.64-21.59 48.24-48.24 48.24zm0-24.84c12.92 0 23.4-10.48 23.4-23.4v-.48c0-12.92-10.48-23.4-23.4-23.4-12.92 0-23.4 10.48-23.4 23.4v.48c0 12.92 10.48 23.4 23.4 23.4zm76.53-70.79H354.3v96.65c0 12.82-10.4 23.22-23.22 23.22h-6.68c-12.82 0-23.22-10.4-23.22-23.22v-96.65h23.22zm44.25-11.45c8.66 0 15.68 7.02 15.68 15.68s-7.02 15.68-15.68 15.68-15.68-7.02-15.68-15.68 7.02-15.68 15.68-15.68zm55.33 107.08c-26.65 0-48.24-21.6-48.24-48.24v-.48c0-26.65 21.6-48.24 48.24-48.24 26.65 0 48.24 21.6 48.24 48.24v.48c0 26.64-21.59 48.24-48.24 48.24zm0-24.84c12.92 0 23.4-10.48 23.4-23.4v-.48c0-12.92-10.48-23.4-23.4-23.4-12.92 0-23.4 10.48-23.4 23.4v.48c0 12.92 10.48 23.4 23.4 23.4z" fill="white"/>
                   </svg>
-                  Zalo
+                  <span>Chat Zalo</span>
                 </a>
               )}
             </div>
