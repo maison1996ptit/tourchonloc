@@ -63,12 +63,8 @@ export default function Footer() {
             </ul>
             <div className={styles.socials}>
               {settings.socialLinks.zalo && (
-                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'white', color: '#0068FF', padding: '8px 20px', borderRadius: '24px', textDecoration: 'none', fontWeight: 'bold', fontSize: '15px', transition: 'all 0.3s ease', border: '1px solid #0068FF', boxShadow: '0 4px 6px rgba(0, 104, 255, 0.1)' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-                    <path d="M21.822 10.28c0-5.674-4.885-10.28-10.91-10.28C4.887 0 0 4.606 0 10.28c0 3.197 1.554 6.064 3.992 7.952.127.098.204.254.195.412l-.248 3.55c-.062.88 1.05 1.353 1.705.726l3.968-3.79c.148-.142.348-.204.55-.168.895.158 1.826.242 2.75.242 6.025 0 10.91-4.606 10.91-10.28z" fill="#0068FF"/>
-                    <path d="M7.74 13.91H5.454v-5.26h3.454c.732 0 1.312.585 1.312 1.306v.294c0 .72-.58 1.305-1.312 1.305H7.74v2.355zm2.986 0c0 1.258.98 2.278 2.193 2.278 1.213 0 2.193-1.02 2.193-2.278V8.65h-4.386v5.26zm6.262 0h-2.193V8.65h2.193v5.26zm3.567-2.982c0-1.258-.98-2.278-2.193-2.278-1.213 0-2.193 1.02-2.193 2.278v.294c0 1.258.98 2.278 2.193 2.278 1.213 0 2.193-1.02 2.193-2.278v-.294z" fill="white"/>
-                  </svg>
-                  <span>Chat Zalo</span>
+                <a href={settings.socialLinks.zalo} target="_blank" rel="noopener noreferrer" style={{ color: '#0068FF', textDecoration: 'underline', fontWeight: 'bold' }}>
+                  Zalo
                 </a>
               )}
             </div>
