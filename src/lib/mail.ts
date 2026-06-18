@@ -72,7 +72,7 @@ export async function sendLeadNotificationEmail(lead: Omit<Lead, 'id' | 'created
   if (transporter) {
     try {
       await transporter.sendMail({
-        from: `"TravelApp Notification" <${fromEmail}>`,
+        from: `"Tour Chọn Lọc Notification" <${fromEmail}>`,
         to: adminEmail,
         subject,
         html: htmlContent,
@@ -137,16 +137,16 @@ export async function sendMarketingEmail(
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #334155; line-height: 1.6;">
       <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="color: #1a56db; margin: 0;">TravelApp</h2>
+        <h2 style="color: #1a56db; margin: 0;">Tour Chọn Lọc</h2>
       </div>
       <div style="white-space: pre-wrap; font-size: 14px; color: #334155;">
         ${personalizedBody}
       </div>
       ${toursHtml}
       <div style="border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 25px; text-align: center; font-size: 12px; color: #94a3b8;">
-        Bạn nhận được email này vì đã quan tâm đến dịch vụ của TravelApp.
+        Bạn nhận được email này vì đã quan tâm đến dịch vụ của Tour Chọn Lọc.
         <br />
-        © 2026 TravelApp. All rights reserved.
+        © 2026 Tour Chọn Lọc. All rights reserved.
       </div>
     </div>
   `;
@@ -154,7 +154,7 @@ export async function sendMarketingEmail(
   if (transporter) {
     try {
       await transporter.sendMail({
-        from: `"TravelApp" <${fromEmail}>`,
+        from: `"Tour Chọn Lọc" <${fromEmail}>`,
         to: toEmail,
         subject,
         html,

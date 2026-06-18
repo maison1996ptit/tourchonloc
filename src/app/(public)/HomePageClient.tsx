@@ -85,7 +85,7 @@ export default function HomePageClient({
   const orgSchemaJson = {
     "@context": "https://schema.org",
     "@type": "TravelAgency",
-    "name": "TravelApp",
+    "name": "Tour Chọn Lọc",
     "url": "https://travelapp.com",
     "logo": "https://travelapp.com/logo.png",
     "description": settings.seoDefaultDescription || "Đại lý du lịch sang trọng, chuyên cung cấp các tour du lịch tinh hoa và bản đồ cẩm nang.",

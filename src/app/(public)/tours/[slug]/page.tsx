@@ -12,13 +12,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   if (!tour) {
     return {
-      title: 'Tour không tìm thấy | TravelApp',
+      title: 'Tour không tìm thấy | Tour Chọn Lọc',
       description: 'Không tìm thấy thông tin chi tiết của chuyến đi được yêu cầu.'
     };
   }
   
   return {
-    title: tour.seoTitle || `${tour.title} | TravelApp`,
+    title: tour.seoTitle || `${tour.title} | Tour Chọn Lọc`,
     description: tour.seoDescription || tour.shortDescription,
     openGraph: {
       title: tour.seoTitle || tour.title,

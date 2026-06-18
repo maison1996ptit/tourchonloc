@@ -5,7 +5,7 @@ import { testimonialService } from '@/services/testimonialService';
 import HomePageClient from './HomePageClient';
 
 export const metadata: Metadata = {
-  title: 'TravelApp | Cẩm Nang Du Lịch & Tour Cao Cấp Tinh Hoa',
+  title: 'Tour Chọn Lọc | Cẩm Nang Du Lịch & Tour Cao Cấp Tinh Hoa',
   description: 'Nền tảng du lịch cao cấp hàng đầu Việt Nam. Khám phá cẩm nang du lịch với bản đồ 15 quốc gia nổi tiếng: Việt Nam, Nhật Bản, Châu Âu (Pháp, Ý, Đức, Anh, Tây Ban Nha, Thụy Sĩ, Hà Lan, Áo, Hy Lạp, Thổ Nhĩ Kỳ), Trung Quốc, Hàn Quốc và Đài Loan.',
   keywords: [
     'tour du lịch cao cấp',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'địa điểm du lịch nổi tiếng'
   ],
   openGraph: {
-    title: 'TravelApp | Cẩm Nang Du Lịch & Tour Cao Cấp Tinh Hoa',
+    title: 'Tour Chọn Lọc | Cẩm Nang Du Lịch & Tour Cao Cấp Tinh Hoa',
     description: 'Bản đồ du lịch với hơn 100+ địa danh nổi bật toàn thế giới cùng các tour du lịch sang trọng, tinh hoa được sàng lọc kỹ càng.',
     url: 'https://travelapp.com',
     type: 'website',
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
         url: '/images/guides/v1.jpg',
         width: 1200,
         height: 750,
-        alt: 'TravelApp Cẩm nang du lịch và Tour cao cấp',
+        alt: 'Tour Chọn Lọc Cẩm nang du lịch và Tour cao cấp',
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TravelApp | Cẩm Nang Du Lịch & Tour Cao Cấp Tinh Hoa',
+    title: 'Tour Chọn Lọc | Cẩm Nang Du Lịch & Tour Cao Cấp Tinh Hoa',
     description: 'Trải nghiệm du lịch cao cấp theo phong cách riêng cùng hệ thống bản đồ du lịch chuẩn xác.',
     images: ['/images/guides/v1.jpg'],
   }

@@ -32,11 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const label = markerCount >= 40 ? '40+ Địa Danh' : `${markerCount} Địa Danh Nổi Tiếng`;
 
   return {
-    title: `Cẩm Nang Du Lịch ${guide.countryName} | Bản Đồ ${label} | TravelApp`,
-    description: guide.introduction || `Kinh nghiệm du lịch ${guide.countryName} chi tiết từ A-Z. Khám phá bản đồ ${markerCount} điểm đến nổi bật nhất cùng TravelApp.`,
+    title: `Cẩm Nang Du Lịch ${guide.countryName} | Bản Đồ ${label} | Tour Chọn Lọc`,
+    description: guide.introduction || `Kinh nghiệm du lịch ${guide.countryName} chi tiết từ A-Z. Khám phá bản đồ ${markerCount} điểm đến nổi bật nhất cùng Tour Chọn Lọc.`,
     keywords: keywords,
     openGraph: {
-      title: `Cẩm Nang Du Lịch ${guide.countryName} | TravelApp`,
+      title: `Cẩm Nang Du Lịch ${guide.countryName} | Tour Chọn Lọc`,
       description: guide.introduction || `Khám phá các địa danh nổi tiếng, cẩm nang bản đồ, kinh nghiệm văn hóa tại ${guide.countryName}.`,
       type: 'article',
       url: `https://travelapp.com/guides/${guide.countrySlug}`,
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Cẩm Nang Du Lịch ${guide.countryName} | TravelApp`,
+      title: `Cẩm Nang Du Lịch ${guide.countryName} | Tour Chọn Lọc`,
       description: guide.introduction || `Khám phá các địa danh nổi tiếng tại ${guide.countryName}.`,
       images: [guide.markers[0]?.imageUrl || '/images/default-share.jpg'],
     }

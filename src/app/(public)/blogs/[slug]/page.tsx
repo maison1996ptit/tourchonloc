@@ -12,13 +12,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   if (!blog) {
     return {
-      title: 'Bài viết không tìm thấy | TravelApp',
+      title: 'Bài viết không tìm thấy | Tour Chọn Lọc',
       description: 'Không tìm thấy nội dung bài viết cẩm nang du lịch được yêu cầu.'
     };
   }
   
   return {
-    title: blog.seoTitle || `${blog.title} | TravelApp`,
+    title: blog.seoTitle || `${blog.title} | Tour Chọn Lọc`,
     description: blog.seoDescription || blog.excerpt,
     openGraph: {
       title: blog.seoTitle || blog.title,

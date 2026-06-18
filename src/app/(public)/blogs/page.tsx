@@ -3,11 +3,11 @@ import { blogService } from '@/services/blogService';
 import BlogsPageClient from './BlogsPageClient';
 
 export const metadata: Metadata = {
-  title: 'Tin Tức & Cẩm Nang Du Lịch Mới Nhất | TravelApp',
-  description: 'Cập nhật tin tức du lịch, cẩm nang chia sẻ kinh nghiệm đi tour, thông tin khuyến mãi và các bài viết PR báo chí mới nhất từ TravelApp.',
+  title: 'Tin Tức & Cẩm Nang Du Lịch Mới Nhất | Tour Chọn Lọc',
+  description: 'Cập nhật tin tức du lịch, cẩm nang chia sẻ kinh nghiệm đi tour, thông tin khuyến mãi và các bài viết PR báo chí mới nhất từ Tour Chọn Lọc.',
   keywords: ['tin tức du lịch', 'cẩm nang du lịch', 'kinh nghiệm du lịch', 'khuyến mãi du lịch', 'bài báo du lịch'],
   openGraph: {
-    title: 'Tin Tức & Cẩm Nang Du Lịch | TravelApp',
+    title: 'Tin Tức & Cẩm Nang Du Lịch | Tour Chọn Lọc',
     description: 'Cập nhật tin tức du lịch mới nhất, kinh nghiệm đi tour và cẩm nang từ chuyên gia.',
     url: 'https://travelapp.com/blogs',
     type: 'website',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
         url: '/logo.png',
         width: 600,
         height: 600,
-        alt: 'TravelApp Logo'
+        alt: 'Tour Chọn Lọc Logo'
       }
     ]
   }

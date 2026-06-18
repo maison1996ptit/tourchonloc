@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://travelapp.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourchonloc.com';
 
   // Fetch published tours and blogs
   const [tours, blogs] = await Promise.all([
