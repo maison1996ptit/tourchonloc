@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import { CountryGuideMap, RegionMarker } from '@/types/guideMap';
 import { Blog } from '@/types/blog';
 import { blogService } from '@/services/blogService';
-import styles from '@/app/(public)/blogs/guides.module.css';
+import styles from '@/app/(public)/cam-nang/guides.module.css';
 import { getMarkerDetailContent } from '@/actions/guideActions';
 
 interface GuideMapCardProps {
@@ -290,7 +290,7 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
               </div>
               {relatedBlog && (
                 <div className={styles.modalActions}>
-                  <a href={`/blogs/${relatedBlog.slug}`} className={styles.readFullBtn}>Đọc cẩm nang chi tiết</a>
+                  <a href={`/cam-nang/${relatedBlog.slug}`} className={styles.readFullBtn}>Đọc cẩm nang chi tiết</a>
                 </div>
               )}
             </div>

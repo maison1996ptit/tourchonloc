@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getVisaServices } from '@/actions/visaActions';
+import { getVisaServices, getVisaStats } from '@/actions/visaActions';
 import InquiryForm from '@/components/public/InquiryForm';
 import { useLanguage } from '@/hooks/useLanguage';
 import styles from './visa.module.css';
@@ -15,9 +15,16 @@ interface VisaService {
   updatedAt: string;
 }
 
+interface VisaStats {
+  passRate: number;
+  successfulClients: number;
+  experienceYears: number;
+}
+
 export default function VisaPage() {
   const { t } = useLanguage();
   const [visas, setVisas] = useState<VisaService[]>([]);
+  const [stats, setStats] = useState<VisaStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMessage, setSelectedMessage] = useState('');
@@ -29,10 +36,14 @@ export default function VisaPage() {
   useEffect(() => {
     const fetchVisaData = async () => {
       try {
-        const data = await getVisaServices();
-        setVisas(data);
+        const [servicesData, statsData] = await Promise.all([
+          getVisaServices(),
+          getVisaStats()
+        ]);
+        setVisas(servicesData);
+        setStats(statsData);
       } catch (error) {
-        console.error('Error fetching visa services:', error);
+        console.error('Error fetching visa page data:', error);
       } finally {
         setLoading(false);
       }
@@ -112,15 +123,15 @@ export default function VisaPage() {
       {/* Trust Statistics Banner */}
       <div className={styles.trustBanner}>
         <div className={styles.trustStat}>
-          <span className={styles.trustNumber}>98.6%</span>
+          <span className={styles.trustNumber}>{stats ? `${stats.passRate}%` : '98.6%'}</span>
           <span className={styles.trustLabel}>Tỷ Lệ Đậu Hồ Sơ</span>
         </div>
         <div className={styles.trustStat}>
-          <span className={styles.trustNumber}>10,000+</span>
+          <span className={styles.trustNumber}>{stats ? `${new Intl.NumberFormat('vi-VN').format(stats.successfulClients)}+` : '10,000+'}</span>
           <span className={styles.trustLabel}>Khách Hàng Thành Công</span>
         </div>
         <div className={styles.trustStat}>
-          <span className={styles.trustNumber}>10+ Năm</span>
+          <span className={styles.trustNumber}>{stats ? `${stats.experienceYears}+ Năm` : '10+ Năm'}</span>
           <span className={styles.trustLabel}>Kinh Nghiệm Thực Tế</span>
         </div>
       </div>
@@ -169,7 +180,7 @@ export default function VisaPage() {
                       const flagUrl = getCountryFlagUrl(visa.country);
                       return (
                         <tr key={visa.id}>
-                          <td className={styles.countryCol}>
+                          <td data-label="Quốc gia" className={styles.countryCol}>
                             <div className={styles.countryWrapper}>
                               <span className={styles.flagIcon}>
                                 {flagUrl ? (
@@ -191,13 +202,13 @@ export default function VisaPage() {
                               <span className={styles.countryName}>{visa.country}</span>
                             </div>
                           </td>
-                          <td className={styles.descriptionCol}>
+                          <td data-label="Chi tiết" className={styles.descriptionCol}>
                             {visa.description || 'Hỗ trợ chuẩn bị hồ sơ chuẩn Đại sứ quán, dịch thuật công chứng và khai form nhanh gọn.'}
                           </td>
-                          <td className={styles.priceCol}>
+                          <td data-label="Giá dịch vụ" className={styles.priceCol}>
                             {formatCurrency(visa.price)}
                           </td>
-                          <td style={{ textAlign: 'center' }}>
+                          <td data-label="Thao tác" style={{ textAlign: 'center' }}>
                             <button
                               className={styles.actionBtn}
                               onClick={() => handleSelectVisa(visa.country)}

@@ -210,9 +210,27 @@
   border-radius: 50%;
 }
 
+@media (max-width: 900px) {
+  .heroContent h1 { font-size: 56px; }
+  .titleDream { font-size: 68px; }
+  .titleMain { font-size: 1.2rem; letter-spacing: 10px; }
+}
+
 @media (max-width: 768px) {
-  .heroContent h1 { font-size: 44px; }
+  .heroContent h1 { 
+    font-size: 44px; 
+    padding: 0 10px;
+  }
   .titleDream { font-size: 56px; }
+  .titleMain {
+    font-size: 1rem;
+    letter-spacing: 8px;
+    margin-left: 8px;
+    gap: 15px;
+  }
+  .titleMain::before, .titleMain::after {
+    width: 30px;
+  }
 }
 
 .heroContent p {
@@ -241,12 +259,10 @@
   align-items: center;
   padding-left: 20px;
 }
-
 .searchIcon {
   font-size: 1.2rem;
   color: var(--text-muted);
 }
-
 .heroSearch input {
   flex: 1;
   border: none;
@@ -255,12 +271,11 @@
   font-size: 1.1rem;
   outline: none;
   color: var(--text-main);
+  min-width: 100px; /* Prevent shrinking */
 }
-
 .heroSearch input::placeholder {
   color: var(--text-muted);
 }
-
 .heroSearch button {
   background: var(--primary-color);
   color: white;
@@ -272,6 +287,7 @@
   transition: all 0.3s;
   font-size: 1rem;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .heroSearch button:hover {

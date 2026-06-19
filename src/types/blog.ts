@@ -6,16 +6,37 @@ export interface BlogCategory {
   slug: string;
 }
 
+export interface MemoCTA {
+  text: string;
+  link: string;
+}
+
+export interface MemoFAQ {
+  q: string;
+  a: string;
+}
+
+export interface MemoContent {
+  hook: string;
+  problem: string;
+  solution: string;
+  experience: string;
+  benefits: string;
+  cta: MemoCTA;
+  faq: MemoFAQ[];
+  tableOfContents: string[];
+}
+
 export interface Blog {
   id: string;
   title: string;
   slug: string;
   categoryId: string;
-  category?: string; // Added for flexibility
-  author?: string;   // Added this field
+  category?: string;
+  author?: string;
   thumbnail: string;
   excerpt: string;
-  content: string; // Markdown or HTML
+  content: string;
   seoTitle: string;
   seoDescription: string;
   tags: string[];
@@ -23,4 +44,9 @@ export interface Blog {
   status: BlogStatus;
   createdAt: string;
   updatedAt: string;
+
+  // Memo fields
+  isMemo?: boolean;
+  coverImage?: string | null;
+  memoContent?: MemoContent | null;
 }

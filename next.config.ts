@@ -6,6 +6,20 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '10mb',
     },
   },
+  async redirects() {
+    return [
+      {
+        source: '/blogs',
+        destination: '/cam-nang',
+        permanent: true,
+      },
+      {
+        source: '/blogs/:slug',
+        destination: '/cam-nang/:slug',
+        permanent: true,
+      },
+    ]
+  },
 };
 
 export default nextConfig;

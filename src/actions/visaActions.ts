@@ -73,3 +73,52 @@ export async function deleteVisaService(id: string) {
 
   return { success: true };
 }
+
+// === Visa Stats Actions ===
+
+export async function getVisaStats() {
+  const stats = await prisma.visaStats.findUnique({
+    where: { id: 'singleton' },
+  });
+
+  if (stats) {
+    return stats;
+  }
+  
+  // If no stats exist, create them with default values
+  const defaultStats = await prisma.visaStats.create({
+    data: {
+      id: 'singleton',
+      passRate: 98.6,
+      successfulClients: 10000,
+      experienceYears: 10,
+    }
+  });
+  return defaultStats;
+}
+
+export async function updateVisaStats(data: {
+  passRate: number;
+  successfulClients: number;
+  experienceYears: number;
+}) {
+  const { passRate, successfulClients, experienceYears } = data;
+
+  if (passRate < 0 || successfulClients < 0 || experienceYears < 0) {
+    throw new Error('Số liệu không được là số âm.');
+  }
+
+  const stats = await prisma.visaStats.update({
+    where: { id: 'singleton' },
+    data: {
+      passRate,
+      successfulClients,
+      experienceYears,
+    },
+  });
+
+  revalidatePath('/visa');
+  revalidatePath('/admin/visas');
+
+  return stats;
+}

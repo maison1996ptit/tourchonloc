@@ -3,7 +3,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { CountryGuideMap } from '@/types/guideMap';
-import styles from '@/app/(public)/blogs/guides.module.css';
+import styles from '@/app/(public)/cam-nang/guides.module.css';
 
 const GuideMapCard = dynamic(() => import('@/components/public/Guides/GuideMapCard'), { 
   ssr: false,

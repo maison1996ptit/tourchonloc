@@ -39,22 +39,27 @@ model Tour {
 }
 
 model Blog {
-  id            String   @id @default(cuid())
-  title         String
-  slug          String   @unique
-  categoryId    String
-  category      String?
-  author        String?
-  thumbnail     String
-  excerpt       String
-  content       String
-  seoTitle      String
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  categoryId     String
+  category       String?
+  author         String?
+  thumbnail      String
+  excerpt        String
+  content        String
+  seoTitle       String
   seoDescription String
-  tags          String[]
-  publishedDate DateTime @default(now())
-  status        String   @default("Published")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  tags           String[]
+  publishedDate  DateTime @default(now())
+  status         String   @default("Published")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Fields for Memo Sale structure
+  isMemo         Boolean  @default(false)
+  coverImage     String?
+  memoContent    Json?
 }
 
 model SiteSettings {
@@ -118,14 +123,14 @@ model Testimonial {
 }
 
 model AuditLog {
-  id         String   @id @default(cuid())
-  action     String
-  userId     String
-  userName   String
-  entityType String
-  entityName String
+  id          String   @id @default(cuid())
+  action      String
+  userId      String
+  userName    String
+  entityType  String
+  entityName  String
   description String
-  time       DateTime @default(now())
+  time        DateTime @default(now())
 }
 
 model Category {
@@ -133,7 +138,7 @@ model Category {
   name        String
   slug        String   @unique
   description String?
-  type        String   // "Tour" or "Blog"
+  type        String // "Tour" or "Blog"
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -152,7 +157,7 @@ model MenuItem {
   url       String
   order     Int
   isActive  Boolean    @default(true)
-  type      String     // "Header" or "Footer"
+  type      String // "Header" or "Footer"
   parentId  String?
   parent    MenuItem?  @relation("MenuHierarchy", fields: [parentId], references: [id])
   children  MenuItem[] @relation("MenuHierarchy")
@@ -167,7 +172,7 @@ model CountryGuide {
   centerLat      Float
   centerLng      Float
   zoom           Int
-  maxBounds      Json?          // [[south, west], [north, east]]
+  maxBounds      Json? // [[south, west], [north, east]]
   markers        RegionMarker[]
   introduction   String?
   cultureInfo    String?
@@ -188,10 +193,10 @@ model RegionMarker {
   markerType       String       @default("Spot") // "Spot" or "Airport"
   contentSlug      String
   shortDescription String
-  imageUrl         String?      // Representative image for the spot
+  imageUrl         String? // Representative image for the spot
   microCopy        String?
   priority         Int          @default(1)
-  metadata         Json?        // For flight times, etc.
+  metadata         Json? // For flight times, etc.
   countryGuideId   String
   countryGuide     CountryGuide @relation(fields: [countryGuideId], references: [id])
   createdAt        DateTime     @default(now())
@@ -207,3 +212,10 @@ model VisaService {
   updatedAt   DateTime @updatedAt
 }
 
+model VisaStats {
+  id                String   @id @default("singleton")
+  passRate          Float    @default(98.6)
+  successfulClients Int      @default(10000)
+  experienceYears   Int      @default(10)
+  updatedAt         DateTime @updatedAt
+}

@@ -1,72 +1,113 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { blogService } from '@/services/blogService';
-import { Blog } from '@/types/blog';
+import { Blog, MemoContent } from '@/types/blog';
 import { useRouter } from 'next/navigation';
 import styles from './tour-form.module.css';
 
 interface BlogFormProps {
-  initialData?: Partial<Blog>;
+  initialData?: Blog;
   isEdit?: boolean;
 }
 
+const defaultMemoContent: MemoContent = {
+  hook: '',
+  problem: '',
+  solution: '',
+  experience: '',
+  benefits: '',
+  cta: { text: '', link: '' },
+  faq: [],
+  tableOfContents: []
+};
+
+const getInitialFormData = (initialData?: Blog): Partial<Blog> => ({
+  title: initialData?.title || '',
+  slug: initialData?.slug || '',
+  categoryId: initialData?.categoryId || '1',
+  thumbnail: initialData?.thumbnail || '',
+  excerpt: initialData?.excerpt || '',
+  content: initialData?.content || '',
+  seoTitle: initialData?.seoTitle || '',
+  seoDescription: initialData?.seoDescription || '',
+  tags: initialData?.tags || [],
+  status: initialData?.status || 'Draft',
+  publishedDate: initialData?.publishedDate ? new Date(initialData.publishedDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+  isMemo: initialData?.isMemo || false,
+  coverImage: initialData?.coverImage || '',
+  memoContent: initialData?.memoContent ? { ...defaultMemoContent, ...initialData.memoContent } : defaultMemoContent,
+  id: initialData?.id
+});
+
+
 export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
   const router = useRouter();
-  const [formData, setFormData] = useState<Partial<Blog>>({
-    title: '',
-    slug: '',
-    categoryId: '1',
-    thumbnail: '',
-    excerpt: '',
-    content: '',
-    seoTitle: '',
-    seoDescription: '',
-    tags: [],
-    status: 'Draft',
-    publishedDate: new Date().toISOString().split('T')[0]
-  });
-
-  useEffect(() => {
-    if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFormData(prev => ({ ...prev, ...initialData }));
-    }
-  }, [initialData]);
+  const [formData, setFormData] = useState<Partial<Blog>>(getInitialFormData(initialData));
+  const [isMemo, setIsMemo] = useState(initialData?.isMemo || false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleMemoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => {
+      const newMemoContent = { ...prev.memoContent, [name]: value };
+      return { ...prev, memoContent: newMemoContent as MemoContent };
+    });
+  };
+  
+  const handleCtaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => {
+      const newMemoContent = { 
+        ...prev.memoContent, 
+        cta: { ...prev.memoContent?.cta, [name]: value } 
+      };
+      return { ...prev, memoContent: newMemoContent as MemoContent };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const dataToSubmit: Partial<Blog> = {
+      ...formData,
+      isMemo,
+      content: isMemo ? '' : formData.content,
+      memoContent: isMemo ? formData.memoContent : undefined,
+    };
+
     try {
       if (isEdit && formData.id) {
-        await blogService.updateBlog(formData.id, formData);
-        alert('Blog post updated successfully!');
+        await blogService.updateBlog(formData.id, dataToSubmit);
+        alert('Cập nhật bài viết thành công!');
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await blogService.createBlog(formData as any);
-        alert('Blog post created successfully!');
+        await blogService.createBlog(dataToSubmit as Omit<Blog, 'id' | 'createdAt' | 'updatedAt'>);
+        alert('Tạo bài viết thành công!');
       }
       router.push('/admin/blogs');
+      router.refresh();
     } catch {
-      alert('Error saving blog post');
+      alert('Lỗi khi lưu bài viết');
     }
   };
 
+  const memoContent = formData.memoContent as MemoContent || defaultMemoContent;
+
   return (
     <div className={styles.container}>
-      <h1>{isEdit ? 'Edit Blog Post' : 'Create New Blog Post'}</h1>
+      <h1>{isEdit ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}</h1>
       
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.grid}>
           <div className={styles.main}>
             <section className={styles.section}>
-              <h3>General Information</h3>
+              <h3>Thông tin chung</h3>
               <div className={styles.field}>
-                <label>Post Title *</label>
+                <label>Tiêu đề *</label>
                 <input name="title" value={formData.title} onChange={handleChange} required />
               </div>
               <div className={styles.field}>
@@ -74,35 +115,52 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
                 <input name="slug" value={formData.slug} onChange={handleChange} required />
               </div>
               <div className={styles.field}>
-                <label>Category</label>
-                <select name="categoryId" value={formData.categoryId} onChange={handleChange}>
-                  <option value="1">Travel Tips</option>
-                  <option value="2">Destinations</option>
-                  <option value="3">Culture</option>
-                </select>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isMemo}
+                    onChange={(e) => setIsMemo(e.target.checked)}
+                    style={{ marginRight: '10px' }}
+                  />
+                  Bài viết dạng Memo Sale
+                </label>
               </div>
             </section>
 
-            <section className={styles.section}>
-              <h3>Content</h3>
-              <div className={styles.field}>
-                <label>Excerpt</label>
-                <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} rows={3} />
-              </div>
-              <div className={styles.field}>
-                <label>Content (Markdown)</label>
-                <textarea name="content" value={formData.content} onChange={handleChange} rows={12} />
-              </div>
-            </section>
+            {isMemo ? (
+              <section className={styles.section}>
+                <h3>Nội dung Memo</h3>
+                <div className={styles.field}><label>Cover Image URL</label><input name="coverImage" value={formData.coverImage || ''} onChange={handleChange} /></div>
+                <div className={styles.field}><label>Hook (gây chú ý)</label><textarea value={memoContent.hook} name="hook" onChange={handleMemoChange} rows={2} /></div>
+                <div className={styles.field}><label>Problem (Vấn đề)</label><textarea value={memoContent.problem} name="problem" onChange={handleMemoChange} rows={3} /></div>
+                <div className={styles.field}><label>Solution (Giải pháp)</label><textarea value={memoContent.solution} name="solution" onChange={handleMemoChange} rows={4} /></div>
+                <div className={styles.field}><label>Experience (Kinh nghiệm)</label><textarea value={memoContent.experience} name="experience" onChange={handleMemoChange} rows={4} /></div>
+                <div className={styles.field}><label>Benefits (Lợi ích)</label><textarea value={memoContent.benefits} name="benefits" onChange={handleMemoChange} rows={4} /></div>
+                <div className={styles.field}><label>CTA Text</label><input value={memoContent.cta.text} name="text" onChange={handleCtaChange} /></div>
+                <div className={styles.field}><label>CTA Link</label><input value={memoContent.cta.link} name="link" onChange={handleCtaChange} /></div>
+              </section>
+            ) : (
+              <section className={styles.section}>
+                <h3>Nội dung bài viết</h3>
+                <div className={styles.field}>
+                  <label>Tóm tắt</label>
+                  <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} rows={3} />
+                </div>
+                <div className={styles.field}>
+                  <label>Nội dung (Hỗ trợ Markdown)</label>
+                  <textarea name="content" value={formData.content} onChange={handleChange} rows={12} />
+                </div>
+              </section>
+            )}
 
             <section className={styles.section}>
               <h3>SEO</h3>
               <div className={styles.field}>
-                <label>SEO Title</label>
+                <label>SEO Title (Tối đa 60 ký tự)</label>
                 <input name="seoTitle" value={formData.seoTitle} onChange={handleChange} maxLength={60} />
               </div>
               <div className={styles.field}>
-                <label>SEO Description</label>
+                <label>SEO Description (Tối đa 160 ký tự)</label>
                 <textarea name="seoDescription" value={formData.seoDescription} onChange={handleChange} maxLength={160} rows={2} />
               </div>
             </section>
@@ -110,24 +168,23 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
 
           <aside className={styles.sidebar}>
             <section className={styles.section}>
-              <h3>Status & Media</h3>
+              <h3>Trạng thái & Hình ảnh</h3>
               <div className={styles.field}>
-                <label>Status</label>
+                <label>Trạng thái</label>
                 <select name="status" value={formData.status} onChange={handleChange}>
-                  <option value="Draft">Draft</option>
-                  <option value="Published">Published</option>
+                  <option value="Draft">Bản nháp</option>
+                  <option value="Published">Công khai</option>
                 </select>
               </div>
               <div className={styles.field}>
-                <label>Published Date</label>
+                <label>Ngày đăng</label>
                 <input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} />
               </div>
               <div className={styles.field}>
-                <label>Thumbnail URL</label>
+                <label>Thumbnail URL (Ảnh đại diện)</label>
                 <input name="thumbnail" value={formData.thumbnail} onChange={handleChange} />
                 {formData.thumbnail && (
                   <div className={styles.imagePreview}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={formData.thumbnail} alt="Preview" />
                   </div>
                 )}
@@ -135,8 +192,8 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
             </section>
 
             <div className={styles.actions}>
-              <button type="submit" className={styles.saveBtn}>Save Post</button>
-              <button type="button" onClick={() => router.push('/admin/blogs')} className={styles.cancelBtn}>Cancel</button>
+              <button type="submit" className={styles.saveBtn}>Lưu bài viết</button>
+              <button type="button" onClick={() => router.push('/admin/blogs')} className={styles.cancelBtn}>Hủy</button>
             </div>
           </aside>
         </div>

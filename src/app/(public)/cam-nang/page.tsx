@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { blogService } from '@/services/blogService';
-import BlogsPageClient from './BlogsPageClient';
+import CamNangPageClient from './CamNangPageClient';
 
 export const metadata: Metadata = {
   title: 'Tin Tức & Cẩm Nang Du Lịch Mới Nhất | Tour Chọn Lọc',
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Tin Tức & Cẩm Nang Du Lịch | Tour Chọn Lọc',
     description: 'Cập nhật tin tức du lịch mới nhất, kinh nghiệm đi tour và cẩm nang từ chuyên gia.',
-    url: 'https://travelapp.com/blogs',
+    url: 'https://travelapp.com/cam-nang',
     type: 'website',
     images: [
       {
@@ -29,5 +29,5 @@ export default async function BlogsPage() {
   // Filter for public display: only Published blogs
   const publishedBlogs = allBlogs.filter(b => b.status === 'Published');
   
-  return <BlogsPageClient initialBlogs={publishedBlogs} />;
+  return <CamNangPageClient initialBlogs={publishedBlogs} />;
 }

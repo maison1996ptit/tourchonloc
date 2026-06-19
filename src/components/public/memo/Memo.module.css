@@ -1,0 +1,167 @@
+/* src/components/public/memo/Memo.module.css */
+
+.memoContainer {
+  font-family: var(--font-body);
+  color: #333;
+}
+
+.coverImage {
+  width: 100%;
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.memoSection {
+  margin-bottom: 2.5rem;
+  padding-left: 2rem;
+  border-left: 3px solid var(--primary-color-light);
+}
+
+.memoSection h3 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.memoSection p {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: #4A5568;
+}
+
+/* HighlightBox Component */
+.highlightBox {
+  background-color: #F7FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.highlightIcon {
+  font-size: 1.5rem;
+  margin-top: 4px;
+}
+
+.highlightContent h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: #2D3748;
+}
+
+.highlightContent p {
+  margin: 0;
+  color: #4A5568;
+}
+
+/* CTABlock Component */
+.ctaBlock {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: var(--primary-color-lightest);
+  border-radius: 12px;
+  margin: 3rem 0;
+}
+
+.ctaButton {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1rem 2.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.ctaButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* TableOfContents Component */
+.tocContainer {
+  background-color: #f8f9fa;
+  border-left: 4px solid var(--primary-color);
+  padding: 1.5rem;
+  border-radius: 0 8px 8px 0;
+  margin: 2rem 0;
+}
+
+.tocContainer h4 {
+  margin-top: 0;
+}
+
+.tocContainer ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.tocContainer li {
+  margin-bottom: 0.75rem;
+}
+
+.tocContainer a {
+  text-decoration: none;
+  color: #343a40;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.tocContainer a:hover {
+  color: var(--primary-color);
+}
+
+/* FAQ Component */
+.faqContainer {
+  margin: 3rem 0;
+}
+
+.faqItem {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.faqQuestion {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 1.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faqIcon, .faqIconRotate {
+  font-size: 1.5rem;
+  font-weight: 300;
+  transition: transform 0.3s ease;
+}
+.faqIconRotate {
+  transform: rotate(45deg);
+}
+
+.faqAnswer {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease-in-out;
+}
+
+.faqAnswer p {
+  padding: 0 0 1.5rem 0;
+  line-height: 1.7;
+}

@@ -9,6 +9,6 @@ export async function deleteAllTours() {
 
 export async function deleteAllBlogs() {
   await prisma.blog.deleteMany({});
-  revalidatePath('/blogs');
+  revalidatePath('/cam-nang');
   revalidatePath('/admin/blogs');
 }

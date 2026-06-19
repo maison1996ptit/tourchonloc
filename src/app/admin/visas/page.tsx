@@ -7,6 +7,7 @@ import {
   updateVisaService, 
   deleteVisaService 
 } from '@/actions/visaActions';
+import VisaStatsForm from '@/components/admin/VisaStatsForm';
 import styles from './visas.module.css';
 
 interface VisaService {
@@ -16,6 +17,12 @@ interface VisaService {
   description: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface VisaStats {
+  passRate: number;
+  successfulClients: number;
+  experienceYears: number;
 }
 
 export default function VisasAdminPage() {
@@ -143,6 +150,9 @@ export default function VisasAdminPage() {
         </button>
       </div>
 
+      <VisaStatsForm />
+
+      <h2 className={styles.subHeader}>Bảng giá Dịch vụ</h2>
       {loading ? (
         <div className={styles.loading}>Đang tải danh sách dịch vụ visa...</div>
       ) : visas.length === 0 ? (
