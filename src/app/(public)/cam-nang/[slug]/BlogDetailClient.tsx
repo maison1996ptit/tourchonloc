@@ -84,6 +84,44 @@ function renderStandardBlog(blog: any) {
   );
 }
 
+const ScrollReveal: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.05,
+        rootMargin: '0px 0px -60px 0px'
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      id={id}
+      className={`${styles.scrollReveal} ${isVisible ? styles.scrollRevealActive : ''}`}
+    >
+      {children}
+    </div>
+  );
+};
+
 export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: BlogDetailClientProps) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -177,30 +215,34 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: Blo
               const content = block.content;
               const id = `block-${idx}`;
               
+              let blockEl = null;
               switch (block.type) {
                 case 'Text':
-                  return (
-                    <div key={idx} id={id} className={styles.textBlock}>
+                  blockEl = (
+                    <div className={styles.textBlock}>
                       {content.text}
                     </div>
                   );
+                  break;
                 case 'Image':
-                  return (
-                    <div key={idx} id={id} className={styles.imageBlock}>
+                  blockEl = (
+                    <div className={styles.imageBlock}>
                       <img src={content.url} alt={content.caption || 'Story Image'} loading="lazy" />
                       {content.caption && <p className={styles.imageCaption}>{content.caption}</p>}
                     </div>
                   );
+                  break;
                 case 'Quote':
-                  return (
-                    <blockquote key={idx} id={id} className={styles.quoteBlock}>
+                  blockEl = (
+                    <blockquote className={styles.quoteBlock}>
                       <p className={styles.quoteText}>"{content.text}"</p>
                       {content.author && <cite className={styles.quoteAuthor}>— {content.author}</cite>}
                     </blockquote>
                   );
+                  break;
                 case 'Video':
-                  return (
-                    <div key={idx} id={id} className={styles.videoBlock}>
+                  blockEl = (
+                    <div className={styles.videoBlock}>
                       {content.platform === 'youtube' && (
                         <iframe 
                           src={content.url.includes('youtube.com/embed/') ? content.url : `https://www.youtube.com/embed/${content.url.split('v=')[1]?.split('&')[0] || content.url}`}
@@ -215,9 +257,10 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: Blo
                       )}
                     </div>
                   );
+                  break;
                 case 'CTA':
-                  return (
-                    <div key={idx} id={id} className={styles.ctaBlock}>
+                  blockEl = (
+                    <div className={styles.ctaBlock}>
                       <a 
                         href={content.link} 
                         className={content.type === 'secondary' ? styles.ctaButtonSecondary : styles.ctaButton}
@@ -226,9 +269,10 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: Blo
                       </a>
                     </div>
                   );
+                  break;
                 case 'Gallery':
-                  return (
-                    <div key={idx} id={id} className={styles.galleryBlock}>
+                  blockEl = (
+                    <div className={styles.galleryBlock}>
                       <h4 className={styles.galleryTitle}>🖼️ {content.title || 'Khoảnh khắc ấn tượng'}</h4>
                       <div className={styles.galleryTrack}>
                         {(content.images || []).map((img: any, i: number) => (
@@ -240,9 +284,10 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: Blo
                       </div>
                     </div>
                   );
+                  break;
                 case 'Timeline':
-                  return (
-                    <div key={idx} id={id} className={styles.timelineBlock}>
+                  blockEl = (
+                    <div className={styles.timelineBlock}>
                       <h4 className={styles.timelineLabel}>🍂 Hành trình chặng chặng</h4>
                       {(content.items || []).map((item: any, i: number) => (
                         <div key={i} className={styles.timelineItem}>
@@ -253,9 +298,17 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: Blo
                       ))}
                     </div>
                   );
+                  break;
                 default:
-                  return null;
+                  blockEl = null;
               }
+
+              if (!blockEl) return null;
+              return (
+                <ScrollReveal key={idx} id={id}>
+                  {blockEl}
+                </ScrollReveal>
+              );
             })}
           </div>
 
