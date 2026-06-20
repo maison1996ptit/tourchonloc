@@ -39,7 +39,7 @@ export default function Footer() {
                 src="/logo.png" 
                 alt={settings.websiteName} 
                 className={styles.footerLogo}
-                style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+                style={{ width: 'auto', height: '50px', objectFit: 'contain' }}
               />
               <h3 style={{ margin: 0 }}>{settings.websiteName}</h3>
             </div>

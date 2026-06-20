@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { Blog, BlogStatus, MemoContent } from '@/types/blog';
 import { Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { getAuthSession } from '@/lib/auth-utils';
 
 export async function getBlogs(): Promise<Blog[]> {
   const data = await prisma.blog.findMany({
@@ -21,7 +22,7 @@ export async function getBlogs(): Promise<Blog[]> {
     author: b.author ?? undefined,
     isMemo: b.isMemo ?? undefined,
     coverImage: b.coverImage ?? undefined,
-    memoContent: (b.memoContent as MemoContent) ?? undefined,
+    memoContent: (b.memoContent as unknown as MemoContent) ?? undefined,
   }));
 
   const pinnedId = 'about-us-pinned';
@@ -47,11 +48,16 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
     author: b.author ?? undefined,
     isMemo: b.isMemo ?? undefined,
     coverImage: b.coverImage ?? undefined,
-    memoContent: (b.memoContent as MemoContent) ?? undefined,
+    memoContent: (b.memoContent as unknown as MemoContent) ?? undefined,
   };
 }
 
 export async function createBlog(blog: Omit<Blog, 'id' | 'createdAt' | 'updatedAt'>): Promise<Blog> {
+  const session = await getAuthSession();
+  if (blog.isMemo && (!session || session.role !== 'Admin')) {
+    throw new Error('Bạn không có quyền thực hiện hành động này. Chỉ Admin mới được tạo Memo.');
+  }
+
   const b = await prisma.blog.create({
     data: {
       title: blog.title,
@@ -69,12 +75,13 @@ export async function createBlog(blog: Omit<Blog, 'id' | 'createdAt' | 'updatedA
       status: blog.status || 'Published',
       isMemo: blog.isMemo,
       coverImage: blog.coverImage,
-      memoContent: (blog.memoContent as Prisma.JsonObject) || Prisma.JsonNull,
+      memoContent: (blog.memoContent as unknown as Prisma.JsonObject) || Prisma.JsonNull,
     }
   });
 
   revalidatePath('/cam-nang');
   revalidatePath('/admin/blogs');
+  revalidatePath('/admin/memos');
 
   return {
     ...b,
@@ -82,11 +89,21 @@ export async function createBlog(blog: Omit<Blog, 'id' | 'createdAt' | 'updatedA
     createdAt: b.createdAt.toISOString(),
     updatedAt: b.updatedAt.toISOString(),
     status: b.status as BlogStatus,
-    memoContent: (b.memoContent as MemoContent) ?? undefined,
+    category: b.category ?? undefined,
+    author: b.author ?? undefined,
+    isMemo: b.isMemo ?? undefined,
+    coverImage: b.coverImage ?? undefined,
+    memoContent: (b.memoContent as unknown as MemoContent) ?? undefined,
   };
 }
 
 export async function updateBlog(id: string, updates: Partial<Blog>): Promise<Blog> {
+  const session = await getAuthSession();
+  const oldBlog = await prisma.blog.findUnique({ where: { id } });
+  if (oldBlog && (oldBlog.isMemo || updates.isMemo) && (!session || session.role !== 'Admin')) {
+    throw new Error('Bạn không có quyền thực hiện hành động này. Chỉ Admin mới được sửa Memo.');
+  }
+
   const allowedUpdates: Prisma.BlogUpdateInput = {};
   if (updates.title !== undefined) allowedUpdates.title = updates.title;
   if (updates.slug !== undefined) allowedUpdates.slug = updates.slug;
@@ -104,7 +121,7 @@ export async function updateBlog(id: string, updates: Partial<Blog>): Promise<Bl
   if (updates.isMemo !== undefined) allowedUpdates.isMemo = updates.isMemo;
   if (updates.coverImage !== undefined) allowedUpdates.coverImage = updates.coverImage;
   if (updates.memoContent !== undefined) {
-    allowedUpdates.memoContent = (updates.memoContent as Prisma.JsonObject) || Prisma.JsonNull;
+    allowedUpdates.memoContent = (updates.memoContent as unknown as Prisma.JsonObject) || Prisma.JsonNull;
   }
 
   const b = await prisma.blog.update({
@@ -115,6 +132,7 @@ export async function updateBlog(id: string, updates: Partial<Blog>): Promise<Bl
   revalidatePath('/cam-nang');
   revalidatePath(`/cam-nang/${b.slug}`);
   revalidatePath('/admin/blogs');
+  revalidatePath('/admin/memos');
 
   return {
     ...b,
@@ -122,19 +140,30 @@ export async function updateBlog(id: string, updates: Partial<Blog>): Promise<Bl
     createdAt: b.createdAt.toISOString(),
     updatedAt: b.updatedAt.toISOString(),
     status: b.status as BlogStatus,
-    memoContent: (b.memoContent as MemoContent) ?? undefined,
+    category: b.category ?? undefined,
+    author: b.author ?? undefined,
+    isMemo: b.isMemo ?? undefined,
+    coverImage: b.coverImage ?? undefined,
+    memoContent: (b.memoContent as unknown as MemoContent) ?? undefined,
   };
 }
 
   export async function deleteBlog(id: string) {
+  const session = await getAuthSession();
+  const oldBlog = await prisma.blog.findUnique({ where: { id } });
+  if (oldBlog && oldBlog.isMemo && (!session || session.role !== 'Admin')) {
+    throw new Error('Bạn không có quyền thực hiện hành động này. Chỉ Admin mới được xóa Memo.');
+  }
+
   try {
     await prisma.blog.delete({
       where: { id }
     });
     revalidatePath('/cam-nang');
     revalidatePath('/admin/blogs');
+    revalidatePath('/admin/memos');
     return { success: true };
-  } catch (e) {
+  } catch {
     return { success: false };
   }
   }

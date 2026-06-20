@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Blog } from '@/types/blog';
 import styles from './blogs.module.css';
@@ -17,10 +17,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Reset page when category or search query changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeCategory, searchQuery]);
+
 
   // Extract unique categories dynamically from database articles
   const categories = ['All', ...Array.from(new Set(initialBlogs.map(b => b.category).filter((c): c is string => !!c)))];
@@ -72,7 +69,10 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
             <button
               key={cat}
               className={`${styles.tab} ${activeCategory === cat ? styles.activeTab : ''}`}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => {
+                setActiveCategory(cat);
+                setCurrentPage(1);
+              }}
             >
               {cat === 'All' ? 'Tất cả bài viết' : cat}
             </button>
@@ -86,7 +86,10 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
             placeholder="Tìm kiếm bài viết..."
             className={styles.searchInput}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
       </div>
@@ -94,7 +97,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
       {/* Featured Highlight Card */}
       {featuredPost && (
         <div className={styles.featuredSection}>
-          <Link href={`/blogs/${featuredPost.slug}`} className={styles.featuredCard}>
+          <Link href={`/cam-nang/${featuredPost.slug}`} className={styles.featuredCard}>
             <div 
               className={styles.featuredImage} 
               style={{ backgroundImage: `url(${featuredPost.thumbnail})` }}
@@ -124,7 +127,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
         <>
           <div className={styles.blogGrid}>
             {paginatedPosts.map(post => (
-              <Link href={`/blogs/${post.slug}`} key={post.id} className={styles.blogCard}>
+              <Link href={`/cam-nang/${post.slug}`} key={post.id} className={styles.blogCard}>
                 <div className={styles.cardImageWrapper}>
                   <div 
                     className={styles.cardImage} 

@@ -14,12 +14,13 @@ import FAQ from '@/components/public/memo/FAQ';
 
 interface BlogDetailClientProps {
   initialBlog: Blog | null;
+  relatedBlogs?: Blog[];
 }
 
 const toAnchor = (text: string) => text.toLowerCase().replace(/ /g, '-');
 
 function renderMemo(blog: Blog) {
-  const memo = blog.memoContent as any;
+  const memo = blog.memoContent;
   if (!memo) return <div>Nội dung memo không hợp lệ.</div>;
 
   return (
@@ -85,7 +86,7 @@ function renderStandardBlog(blog: Blog) {
 }
 
 
-export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps) {
+export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: BlogDetailClientProps) {
   if (!initialBlog) {
     return <div className={styles.error}>Không tìm thấy bài viết. <Link href="/cam-nang">Quay lại</Link></div>;
   }
@@ -123,6 +124,27 @@ export default function BlogDetailClient({ initialBlog }: BlogDetailClientProps)
       </header>
 
       {blog.isMemo ? renderMemo(blog) : renderStandardBlog(blog)}
+
+      {relatedBlogs.length > 0 && (
+        <section className={styles.relatedSection}>
+          <h3 className={styles.relatedTitle}>Cẩm Nang Liên Quan</h3>
+          <div className={styles.relatedGrid}>
+            {relatedBlogs.map((rBlog) => (
+              <Link href={`/cam-nang/${rBlog.slug}`} key={rBlog.id} className={styles.relatedCard}>
+                <div 
+                  className={styles.relatedThumb} 
+                  style={{ backgroundImage: `url(${rBlog.thumbnail})` }}
+                />
+                <div className={styles.relatedInfo}>
+                  <span className={styles.relatedCardCategory}>{rBlog.category || rBlog.categoryId}</span>
+                  <h4>{rBlog.title}</h4>
+                  <p>{rBlog.excerpt}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <footer className={styles.footer}>
         <div className={styles.tags}>

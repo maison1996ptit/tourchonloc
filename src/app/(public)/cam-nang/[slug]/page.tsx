@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { blogService } from '@/services/blogService';
+import { Blog } from '@/types/blog';
 import BlogDetailClient from './BlogDetailClient';
 
 interface Props {
@@ -38,5 +39,13 @@ export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params;
   const blog = await blogService.getBlogBySlug(slug);
   
-  return <BlogDetailClient initialBlog={blog} />;
+  let relatedBlogs: Blog[] = [];
+  if (blog) {
+    const allBlogs = await blogService.getBlogs();
+    relatedBlogs = allBlogs
+      .filter(b => b.status === 'Published' && b.id !== blog.id)
+      .slice(0, 3);
+  }
+  
+  return <BlogDetailClient initialBlog={blog} relatedBlogs={relatedBlogs} />;
 }

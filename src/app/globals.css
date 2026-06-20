@@ -119,11 +119,23 @@ img {
     padding: 12px;
   }
 
-  /* 3. Nút bấm trên di động phải to và rõ ràng */
+  /* 3. Nút bấm trên di động phải to và rõ ràng, loại trừ các nút chức năng nhỏ */
+  form button, 
+  button[type="submit"],
+  .submitBtn,
+  .actionBtn,
+  .saveBtn {
+    min-height: 48px !important;
+    width: 100% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Tăng touch target cho các nút bấm nhỏ bằng padding thay vì giãn chiều rộng */
   button {
-    min-height: 48px;
-    width: 100%;
-    justify-content: center;
+    min-height: 44px;
+    padding: 8px 16px;
   }
 }
 

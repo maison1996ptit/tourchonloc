@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   })) as MetadataRoute.Sitemap;
 
   const blogUrls = blogs.map(b => ({
-    url: `${baseUrl}/blogs/${b.slug}`,
+    url: `${baseUrl}/cam-nang/${b.slug}`,
     lastModified: b.updatedAt,
     changeFrequency: 'weekly',
     priority: 0.7

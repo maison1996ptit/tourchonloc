@@ -3,6 +3,64 @@ const prisma = new PrismaClient();
 
 const blogs = [
   {
+    title: "Nhật Bản Tháng 10 Có Gì Đẹp? Cẩm Nang Mùa Lá Đỏ Cho Gia Đình",
+    slug: "nhat-ban-thang-10-co-gi-dep",
+    isMemo: true,
+    coverImage: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200",
+    memoContent: {
+      hook: "Có những chuyến đi mà nhiều năm sau nhìn lại, điều còn đọng lại không phải là đã check-in bao nhiêu điểm đến, mà là những khoảnh khắc được cùng gia đình trải qua một khoảng thời gian thật trọn vẹn. Với Nhật Bản, tháng 10 chính là một trong những thời điểm tuyệt vời nhất như vậy. Đây là lúc mùa thu bắt đầu hiện rõ trên khắp đất nước với tiết trời mát mẻ, bầu trời trong xanh và những sắc vàng, đỏ đầu tiên xuất hiện.",
+      problem: "Nhiều du khách thường nghĩ rằng toàn bộ nước Nhật sẽ đỏ rực vào tháng 10. Nhưng thực tế, mùa lá phong bắt đầu từ vùng lạnh phía Bắc (Hokkaido) trước rồi mới lan dần xuống phía Nam. Đi Tokyo hay Kyoto vào tháng 10, bạn sẽ hụt hẫng vì lá vẫn còn xanh. Ngoài ra, việc di chuyển bằng tàu điện ngầm công cộng phức tạp khi đi cùng người lớn tuổi và trẻ nhỏ rất mệt mỏi, kết hợp với thời tiết tối sớm ở Hokkaido (16h30 đã nhá nhem) khiến bạn dễ bị bể lịch trình.",
+      solution: "Đội ngũ Tour Chọn Lọc đã thiết kế lịch trình chuyên biệt cho mùa lá đỏ tháng 10. Chúng tôi đưa bạn đến đúng nơi lá chuyển màu rực rỡ nhất (Hokkaido, Jozankei, đèo phong Nikko, Kawaguchi ngắm Phú Sĩ). Đặc biệt, chuyến đi sử dụng xe du lịch riêng đưa đón tận nơi, sắp xếp thời gian Onsen thư giãn ấm áp ngay khi trời vừa sập tối, giúp cả gia đình thong thả tận hưởng chuyến đi.",
+      experience: "Nên chuẩn bị trang phục theo kiểu 'củ hành' – nhiều lớp áo mỏng để dễ dàng điều chỉnh khi nhiệt độ thay đổi từ 10°C (ban đêm) đến 24°C (ban ngày). Tránh di chuyển đèo Irohazaka (Nikko) vào ngày cuối tuần vì cực kỳ tắc đường, hãy đi ngày thường hoặc xuất phát thật sớm. Ở Kawaguchi, các điểm ngắm Phú Sĩ khá xa nhau, thuê xe riêng sẽ tối ưu hơn xe bus công cộng rất nhiều.",
+      benefits: "Đặt tour tại Tour Chọn Lọc, bạn được hỗ trợ thủ tục Visa trọn gói với tỷ lệ đậu 100%. Lịch trình được may đo phù hợp cho gia đình nhiều thế hệ, dịch vụ 4-5 sao chất lượng cao, hướng dẫn viên bản địa am hiểu văn hóa đồng hành suốt chặng, cam kết giá cả minh bạch không phát sinh chi phí ẩn.",
+      cta: { text: "Nhận Tư Vấn Thiết Kế Lịch Trình Miễn Phí", link: "/customize-trip" },
+      faq: [
+        { q: "Làm sao để tắm Onsen đúng cách cho trẻ nhỏ?", a: "Các khu tắm Onsen có quy định nhiệt độ riêng. Chuyên viên của Tour Chọn Lọc sẽ tư vấn các bể tắm Onsen gia đình riêng tư (Kashikiri) có nhiệt độ nước vừa phải, an toàn cho bé." },
+        { q: "Thời gian làm Visa Nhật Bản mất bao lâu?", a: "Thông thường làm Visa Nhật Bản mất từ 8-10 ngày làm việc. Bạn nên nộp hồ sơ trước ngày khởi hành dự kiến ít nhất 30 ngày để đảm bảo lịch trình." }
+      ],
+      tableOfContents: ["Hiểu lầm về mùa lá đỏ Nhật Bản", "Hành trình ngắm lá đỏ lý tưởng tháng 10", "Kinh nghiệm thực tế khi đi cùng gia đình", "Lợi ích khi đặt tour trọn gói tại Tour Chọn Lọc"]
+    },
+    content: "",
+    excerpt: "Lá đỏ tháng 10 ngắm ở đâu đẹp nhất? Hướng dẫn đầy đủ và kinh nghiệm du lịch Nhật Bản mùa thu cho gia đình có trẻ nhỏ và người cao tuổi.",
+    author: "Chuyên gia Tour Chọn Lọc",
+    categoryId: "cam-nang",
+    category: "Cẩm nang du lịch",
+    thumbnail: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800",
+    status: "Published",
+    tags: ["Nhật Bản", "Mùa lá đỏ", "Hokkaido", "Gia đình"],
+    seoTitle: "Cẩm Nang Du Lịch Nhật Bản Mùa Thu Lá Đỏ",
+    seoDescription: "Khám phá kinh nghiệm ngắm lá đỏ Nhật Bản tháng 10 tại Hokkaido, Nikko, Phú Sĩ cùng lịch trình tối ưu cho gia đình có người cao tuổi."
+  },
+  {
+    title: "Chi Phí Đi Nhật Bản Tháng 10 Hết Bao Nhiêu? Phân Tích Chi Phí Thực Tế Cho Gia Đình",
+    slug: "chi-phi-di-nhat-ban-thang-10",
+    isMemo: true,
+    coverImage: "https://images.unsplash.com/photo-1502484437255-75e1f0e20ec4?auto=format&fit=crop&w=1200",
+    memoContent: {
+      hook: "Khi bắt đầu lên kế hoạch du lịch Nhật Bản mùa thu, câu hỏi lớn nhất của các gia đình là: 'Đi Nhật Bản tháng 10 hết khoảng bao nhiêu tiền?'. Các quảng cáo tour thường báo giá 25-35 triệu, nhưng tổng chi phí thực tế cho gia đình 4 người (gồm 2 người lớn, 1 trẻ em, 1 người lớn tuổi) đi tự túc mùa cao điểm thường cao hơn rất nhiều do các chi phí phát sinh ẩn.",
+      problem: "Chi phí thực tế tự túc bao gồm: Vé máy bay khứ hồi chất lượng cao (12-16 triệu/người), khách sạn trung tâm cho gia đình mùa cao điểm (3-4 triệu/đêm), ăn uống thoải mái cho mọi thế hệ (1.2 triệu/người/ngày), và chi phí di chuyển liên tỉnh đắt đỏ ở Nhật Bản (tàu nhanh Shinkansen, bus, xe riêng ngắm cảnh từ 4-5 triệu/người). Tổng cộng ngân sách tự túc vọt lên khoảng 128 triệu đồng cho gia đình 4 người, chưa kể việc tự chuẩn bị hồ sơ visa phức tạp và căng thẳng.",
+      solution: "Tour Chọn Lọc mang đến giải pháp tour trọn gói gia đình cao cấp với chi phí trọn gói chỉ khoảng 32 triệu đồng/người. Mức giá này đã bao gồm toàn bộ vé máy bay thẳng, khách sạn 4 sao gần ga trung tâm, các bữa ăn tiêu chuẩn cao và dịch vụ làm visa trọn gói, giúp bạn tiết kiệm 30% ngân sách và loại bỏ hoàn toàn mệt mỏi.",
+      experience: "Hãy ưu tiên các chuyến bay thẳng của Vietnam Airlines hoặc ANA để đảm bảo sức khỏe cho ông bà và trẻ nhỏ, tránh bay transit giá rẻ gây mệt mỏi. Nên đặt tour trước tối thiểu 60 ngày để hưởng chính sách ưu đãi nhóm đặc biệt từ Tour Chọn Lọc.",
+      benefits: "Đặt tour sớm giúp gia đình an tâm 100% đậu Visa. Bạn sẽ có xe du lịch đưa đón suốt tuyến không lo đi bộ mang vác hành lý nặng tại các ga tàu điện ngầm. Đặc biệt: Đăng ký nhóm gia đình từ 4 người trở lên được Giảm ngay 1.000.000đ/khách.",
+      cta: { text: "Nhận Báo Giá Tour Trọn Gói Ưu Đãi", link: "/contact" },
+      faq: [
+        { q: "Chi phí tour đã bao gồm phí làm Visa chưa?", a: "Có, giá tour trọn gói của Tour Chọn Lọc đã bao gồm toàn bộ lệ phí Đại sứ quán và phí chuẩn bị hồ sơ dịch thuật công chứng visa." },
+        { q: "Chính sách giảm giá nhóm 4 người áp dụng như thế nào?", a: "Khi đăng ký nhóm gia đình từ 4 người trước ngày khởi hành 60 ngày, bạn sẽ được trừ trực tiếp 1.000.000đ/khách vào tổng giá trị hợp đồng." }
+      ],
+      tableOfContents: ["Chi tiết các hạng mục chi phí đi Nhật", "Những chi phí ẩn gia đình thường bỏ qua", "So sánh kinh tế giữa đi tự túc và đi tour", "Ưu đãi đặc biệt khi đặt tour sớm"]
+    },
+    content: "",
+    excerpt: "Phân tích chi tiết chi phí vé máy bay, khách sạn, ăn uống và di chuyển mùa thu Nhật Bản. So sánh thực tế chi phí đi tự túc và đi tour trọn gói cho gia đình.",
+    author: "Chuyên gia Tài chính Du Lịch",
+    categoryId: "cam-nang",
+    category: "Cẩm nang du lịch",
+    thumbnail: "https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?auto=format&fit=crop&w=800",
+    status: "Published",
+    tags: ["Chi phí du lịch", "Kinh nghiệm du lịch", "Gia đình", "Nhật Bản"],
+    seoTitle: "Chi Phí Du Lịch Nhật Bản Tháng 10 Thực Tế Cho Gia Đình",
+    seoDescription: "Tính toán chi tiết ngân sách đi Nhật Bản tháng 10 cho gia đình 4 người. So sánh chi phí đi tự túc và đi tour trọn gói cùng ưu đãi nhóm."
+  },
+  {
     title: "Bí Quyết Săn Sale Du Lịch: Đừng Để Giá Cả Cản Trở Chuyến Đi!",
     slug: "bi-quyet-san-sale-du-lich",
     isMemo: true,
