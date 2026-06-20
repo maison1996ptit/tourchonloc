@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { blogService } from '@/services/blogService';
+import { prisma } from '@/lib/prisma';
 import CamNangPageClient from './CamNangPageClient';
 
 export const metadata: Metadata = {
@@ -25,9 +26,38 @@ export const metadata: Metadata = {
 export default async function BlogsPage() {
   // Fetch all blogs from database
   const allBlogs = await blogService.getBlogs();
-  
-  // Filter for public display: only Published blogs
   const publishedBlogs = allBlogs.filter(b => b.status === 'Published');
-  
-  return <CamNangPageClient initialBlogs={publishedBlogs} />;
+
+  // Fetch all guides from database
+  const allGuides = await prisma.guide.findMany({
+    where: { status: 'Published' },
+    include: { category: true }
+  });
+
+  const mappedGuides = allGuides.map(g => ({
+    id: g.id,
+    title: g.title,
+    slug: g.slug,
+    categoryId: g.categoryId || 'cam-nang',
+    category: g.category?.name || 'Cẩm nang du lịch',
+    author: 'Chuyên gia Tour Chọn Lọc',
+    thumbnail: g.coverImage,
+    excerpt: g.excerpt,
+    content: '',
+    seoTitle: g.title,
+    seoDescription: g.excerpt,
+    tags: [],
+    publishedDate: (g.publishedAt || g.createdAt).toISOString(),
+    status: 'Published' as const,
+    createdAt: g.createdAt.toISOString(),
+    updatedAt: g.updatedAt.toISOString(),
+    isMemo: true // Trigger magazine storytelling renderer style
+  }));
+
+  // Combine and sort by date descending
+  const combined = [...publishedBlogs, ...mappedGuides].sort(
+    (a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
+  );
+
+  return <CamNangPageClient initialBlogs={combined} />;
 }

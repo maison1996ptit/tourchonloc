@@ -219,3 +219,69 @@ model VisaStats {
   experienceYears   Int      @default(10)
   updatedAt         DateTime @updatedAt
 }
+
+model Guide {
+  id            String         @id @default(cuid())
+  title         String
+  slug          String         @unique
+  excerpt       String
+  coverImage    String
+  status        String         @default("Draft") // "Draft", "Published", "Scheduled"
+  publishedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  categoryId    String?
+  category      GuideCategory? @relation(fields: [categoryId], references: [id])
+  
+  tags          GuideTag[]     @relation("GuideToTag")
+  seo           GuideSEO?
+  blocks        GuideBlock[]
+}
+
+model GuideBlock {
+  id          String   @id @default(cuid())
+  guideId     String
+  guide       Guide    @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  type        String   // "Text", "Image", "Gallery", "Quote", "Video", "CTA", "Timeline"
+  order       Int      // Thứ tự sắp xếp các block
+  content     Json     // Nội dung của block
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GuideCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  guides      Guide[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GuideTag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  guides    Guide[]  @relation("GuideToTag")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GuideSEO {
+  id                 String   @id @default(cuid())
+  guideId            String   @unique
+  guide              Guide    @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  title              String?
+  description        String?
+  keywords           String?
+  ogTitle            String?
+  ogDescription      String?
+  ogImage            String?
+  twitterTitle       String?
+  twitterDescription String?
+  twitterImage       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}

@@ -440,6 +440,38 @@ Hàn Quốc không chỉ có trên phim ảnh. Khi trực tiếp đặt chân đ
     }
   });
 
+  // 11. Guide Categories & Tags
+  console.log('Restoring Guide Categories & Tags...');
+  const guideCategories = [
+    { name: 'Cẩm nang du lịch', slug: 'cam-nang-du-lich', description: 'Kinh nghiệm du lịch trọn gói cao cấp.' },
+    { name: 'Cẩm nang tự túc', slug: 'cam-nang-tu-tuc', description: 'Bí quyết khám phá tự do.' },
+    { name: 'Kinh nghiệm ăn uống', slug: 'kinh-nghiem-an-uong', description: 'Khám phá văn hóa ẩm thực địa phương.' }
+  ];
+
+  for (const cat of guideCategories) {
+    await prisma.guideCategory.upsert({
+      where: { slug: cat.slug },
+      update: { name: cat.name, description: cat.description },
+      create: { name: cat.name, slug: cat.slug, description: cat.description }
+    });
+  }
+
+  const guideTags = [
+    { name: 'Nhật Bản', slug: 'nhat-ban' },
+    { name: 'Hàn Quốc', slug: 'han-quoc' },
+    { name: 'Mùa thu', slug: 'mua-thu' },
+    { name: 'Tiết kiệm', slug: 'tiet-kiem' },
+    { name: 'Gia đình', slug: 'gia-dinh' }
+  ];
+
+  for (const tag of guideTags) {
+    await prisma.guideTag.upsert({
+      where: { slug: tag.slug },
+      update: { name: tag.name },
+      create: { name: tag.name, slug: tag.slug }
+    });
+  }
+
   console.log('--- ALL DATA RESTORED SUCCESSFULLY ---');
 }
 

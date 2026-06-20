@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Blog } from '@/types/blog';
 import styles from './blog-detail.module.css';
 import memoStyles from '@/components/public/memo/Memo.module.css';
@@ -13,13 +13,13 @@ import TableOfContents from '@/components/public/memo/TableOfContents';
 import FAQ from '@/components/public/memo/FAQ';
 
 interface BlogDetailClientProps {
-  initialBlog: Blog | null;
+  initialBlog: any;
   relatedBlogs?: Blog[];
 }
 
 const toAnchor = (text: string) => text.toLowerCase().replace(/ /g, '-');
 
-function renderMemo(blog: Blog) {
+function renderMemo(blog: any) {
   const memo = blog.memoContent;
   if (!memo) return <div>Nội dung memo không hợp lệ.</div>;
 
@@ -64,8 +64,7 @@ function renderMemo(blog: Blog) {
   );
 }
 
-function renderStandardBlog(blog: Blog) {
-  // Assuming blog.content is pre-sanitized HTML from Markdown
+function renderStandardBlog(blog: any) {
   return (
     <>
       <div 
@@ -85,8 +84,23 @@ function renderStandardBlog(blog: Blog) {
   );
 }
 
-
 export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: BlogDetailClientProps) {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    if (!initialBlog || !initialBlog.isGuide) return;
+
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        setScrollProgress((window.scrollY / totalScroll) * 100);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [initialBlog]);
+
   if (!initialBlog) {
     return <div className={styles.error}>Không tìm thấy bài viết. <Link href="/cam-nang">Quay lại</Link></div>;
   }
@@ -107,6 +121,184 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: Blo
     }
   };
 
+  // 1. Google Arts & Culture Story Immersive Rendering
+  if (blog.isGuide) {
+    const tocItems: { label: string; anchor: string }[] = [];
+    blog.blocks?.forEach((block: any, idx: number) => {
+      if (block.type === 'Timeline' && block.content.items?.length > 0) {
+        tocItems.push({ label: 'Lịch Trình Chi Tiết', anchor: `block-${idx}` });
+      } else if (block.type === 'Gallery' && block.content.images?.length > 0) {
+        tocItems.push({ label: 'Bộ Sưu Tập Ảnh', anchor: `block-${idx}` });
+      } else if (block.type === 'Quote') {
+        tocItems.push({ label: 'Góc Nhìn Chuyên Gia', anchor: `block-${idx}` });
+      } else if (block.type === 'Text' && idx === 0) {
+        tocItems.push({ label: 'Bắt Đầu Hành Trình', anchor: `block-${idx}` });
+      } else if (block.type === 'CTA') {
+        tocItems.push({ label: 'Đăng Ký & Nhận Ưu Đãi', anchor: `block-${idx}` });
+      }
+    });
+
+    if (tocItems.length === 0) {
+      tocItems.push({ label: 'Giới Thiệu Câu Chuyện', anchor: 'story-start' });
+    }
+
+    return (
+      <div className={styles.immersiveWrapper}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        />
+        {/* Reading progress bar */}
+        <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
+
+        {/* Immersive Hero Header */}
+        <div 
+          className={styles.immersiveHero}
+          style={{ backgroundImage: `url(${blog.thumbnail})` }}
+        >
+          <div className={styles.immersiveHeroContent}>
+            <span className={styles.immersiveCategory}>{blog.category}</span>
+            <h1 className={styles.immersiveTitle}>{blog.title}</h1>
+            <p className={styles.immersiveExcerpt}>{blog.excerpt}</p>
+            <div className={styles.immersiveMeta}>
+              <span>✍️ {blog.author}</span>
+              <span>•</span>
+              <span>📅 {new Date(blog.publishedDate).toLocaleDateString('vi-VN')}</span>
+              <span>•</span>
+              <span>⏱️ Đọc khoảng 5 phút</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main story grid with sticky TOC */}
+        <div className={styles.immersiveBodyGrid} id="story-start">
+          <div className={styles.immersiveStoryContent}>
+            {blog.blocks?.map((block: any, idx: number) => {
+              const content = block.content;
+              const id = `block-${idx}`;
+              
+              switch (block.type) {
+                case 'Text':
+                  return (
+                    <div key={idx} id={id} className={styles.textBlock}>
+                      {content.text}
+                    </div>
+                  );
+                case 'Image':
+                  return (
+                    <div key={idx} id={id} className={styles.imageBlock}>
+                      <img src={content.url} alt={content.caption || 'Story Image'} loading="lazy" />
+                      {content.caption && <p className={styles.imageCaption}>{content.caption}</p>}
+                    </div>
+                  );
+                case 'Quote':
+                  return (
+                    <blockquote key={idx} id={id} className={styles.quoteBlock}>
+                      <p className={styles.quoteText}>"{content.text}"</p>
+                      {content.author && <cite className={styles.quoteAuthor}>— {content.author}</cite>}
+                    </blockquote>
+                  );
+                case 'Video':
+                  return (
+                    <div key={idx} id={id} className={styles.videoBlock}>
+                      {content.platform === 'youtube' && (
+                        <iframe 
+                          src={content.url.includes('youtube.com/embed/') ? content.url : `https://www.youtube.com/embed/${content.url.split('v=')[1]?.split('&')[0] || content.url}`}
+                          title="YouTube video player"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      )}
+                      {content.platform !== 'youtube' && (
+                        <iframe src={content.url} title="Video player" frameBorder="0" allowFullScreen />
+                      )}
+                    </div>
+                  );
+                case 'CTA':
+                  return (
+                    <div key={idx} id={id} className={styles.ctaBlock}>
+                      <a 
+                        href={content.link} 
+                        className={content.type === 'secondary' ? styles.ctaButtonSecondary : styles.ctaButton}
+                      >
+                        {content.text}
+                      </a>
+                    </div>
+                  );
+                case 'Gallery':
+                  return (
+                    <div key={idx} id={id} className={styles.galleryBlock}>
+                      <h4 className={styles.galleryTitle}>🖼️ {content.title || 'Khoảnh khắc ấn tượng'}</h4>
+                      <div className={styles.galleryTrack}>
+                        {(content.images || []).map((img: any, i: number) => (
+                          <div key={i} className={styles.gallerySlide}>
+                            <img src={img.url} alt={img.caption || 'Slide'} loading="lazy" />
+                            {img.caption && <p>{img.caption}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                case 'Timeline':
+                  return (
+                    <div key={idx} id={id} className={styles.timelineBlock}>
+                      <h4 className={styles.timelineLabel}>🍂 Hành trình chặng chặng</h4>
+                      {(content.items || []).map((item: any, i: number) => (
+                        <div key={i} className={styles.timelineItem}>
+                          <span className={styles.timelineIcon}>{item.icon || '✓'}</span>
+                          <h4>{item.title}</h4>
+                          <p>{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                default:
+                  return null;
+              }
+            })}
+          </div>
+
+          <aside className={styles.sidebarTOC}>
+            <h4 className={styles.tocTitle}>CÂU CHUYỆN</h4>
+            <ul className={styles.tocList}>
+              {tocItems.map((item, idx) => (
+                <li key={idx}>
+                  <a href={`#${item.anchor}`} className={styles.tocLink}>
+                    {idx + 1}. {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        </div>
+
+        {/* Related Section at the bottom */}
+        {relatedBlogs.length > 0 && (
+          <section className={styles.relatedSection} style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 2rem' }}>
+            <h3 className={styles.relatedTitle} style={{ color: '#ffffff' }}>Cẩm Nang Liên Quan</h3>
+            <div className={styles.relatedGrid}>
+              {relatedBlogs.map((rBlog) => (
+                <Link href={`/cam-nang/${rBlog.slug}`} key={rBlog.id} className={styles.relatedCard} style={{ background: '#1e293b' }}>
+                  <div 
+                    className={styles.relatedThumb} 
+                    style={{ backgroundImage: `url(${rBlog.thumbnail})` }}
+                  />
+                  <div className={styles.relatedInfo}>
+                    <span className={styles.relatedCardCategory}>{rBlog.category}</span>
+                    <h4 style={{ color: '#ffffff' }}>{rBlog.title}</h4>
+                    <p style={{ color: '#94a3b8' }}>{rBlog.excerpt}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    );
+  }
+
+  // 2. Fallback to Traditional Blog or Memo rendering
   return (
     <article className={styles.container}>
       <script
@@ -148,7 +340,7 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: Blo
 
       <footer className={styles.footer}>
         <div className={styles.tags}>
-          {blog.tags.map(tag => (
+          {blog.tags?.map((tag: string) => (
             <span key={tag} className={styles.tag}>#{tag}</span>
           ))}
         </div>

@@ -4,13 +4,17 @@ import { prisma } from '@/lib/prisma';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourchonloc.com';
 
-  // Fetch published tours and blogs
-  const [tours, blogs] = await Promise.all([
+  // Fetch published tours, blogs and guides
+  const [tours, blogs, guides] = await Promise.all([
     prisma.tour.findMany({
       where: { status: 'Published' },
       select: { slug: true, updatedAt: true }
     }),
     prisma.blog.findMany({
+      where: { status: 'Published' },
+      select: { slug: true, updatedAt: true }
+    }),
+    prisma.guide.findMany({
       where: { status: 'Published' },
       select: { slug: true, updatedAt: true }
     })
@@ -39,5 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7
   })) as MetadataRoute.Sitemap;
 
-  return [...staticPages, ...tourUrls, ...blogUrls];
+  const guideUrls = guides.map(g => ({
+    url: `${baseUrl}/cam-nang/${g.slug}`,
+    lastModified: g.updatedAt,
+    changeFrequency: 'weekly',
+    priority: 0.7
+  })) as MetadataRoute.Sitemap;
+
+  return [...staticPages, ...tourUrls, ...blogUrls, ...guideUrls];
 }

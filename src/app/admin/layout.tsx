@@ -18,6 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: t('common.tours'), path: '/admin/tours', icon: '✈️' },
     { label: t('common.blogs'), path: '/admin/blogs', icon: '📝' },
     { label: 'Quản lý Memo', path: '/admin/memos', icon: '💡' },
+    { label: 'Quản lý Cẩm Nang', path: '/admin/guides', icon: '📖' },
     { label: t('nav.leads'), path: '/admin/leads', icon: '🤝' },
     { label: t('nav.testimonials'), path: '/admin/testimonials', icon: '⭐' },
     { label: t('nav.visas'), path: '/admin/visas', icon: '🛂' },
