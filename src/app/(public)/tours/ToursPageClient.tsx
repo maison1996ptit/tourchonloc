@@ -100,21 +100,21 @@ function ToursList({ initialTours }: ToursPageClientProps) {
               </div>
             </div>
             <div className={styles.tourInfo}>
+              <div className={styles.departureBadgeTop}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="15.5" cy="15.5" r="2.5" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1"/>
+                </svg>
+                <span>
+                  {tour.departureDates && tour.departureDates.length > 0 
+                    ? `Khởi hành: ${tour.departureDates[0]}`
+                    : t('common.book_now')}
+                </span>
+              </div>
               <h3>{tour.title}</h3>
               <p className={styles.destination}>{tour.destination} • {tour.durationDays} {t('common.days')}</p>
               <p className={styles.shortDesc}>{tour.shortDescription}</p>
               <div className={styles.cardFooter}>
-                <div className={styles.miniBadge}>
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="15.5" cy="15.5" r="2.5" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1"/>
-                  </svg>
-                  <span>
-                    {tour.departureDates && tour.departureDates.length > 0 
-                      ? `${tour.departureDates[0]}`
-                      : t('common.book_now')}
-                  </span>
-                </div>
                 <Link href={`/tours/${tour.slug}`} className={styles.viewBtn}>{t('common.view_details')} →</Link>
               </div>
               <div className={styles.priceContainer}>
