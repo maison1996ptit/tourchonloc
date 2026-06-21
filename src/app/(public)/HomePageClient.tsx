@@ -34,11 +34,7 @@ export default function HomePageClient({
   const { theme } = useTheme();
   const sliderRef = React.useRef<HTMLDivElement>(null);
 
-  const [currentVideoIdx, setCurrentVideoIdx] = useState(0);
 
-  const handleVideoEnded = () => {
-    setCurrentVideoIdx((prev) => (prev + 1) % BACKGROUND_VIDEOS.length);
-  };
 
   const scrollPrev = () => {
     if (sliderRef.current) {
@@ -140,15 +136,14 @@ export default function HomePageClient({
 
       <section className={styles.hero}>
         <video 
-          key={currentVideoIdx}
           autoPlay 
           muted 
           playsInline 
+          loop
           className={styles.heroVideo}
           poster={settings.heroImage}
-          onEnded={handleVideoEnded}
         >
-          <source src={BACKGROUND_VIDEOS[currentVideoIdx]} type="video/mp4" />
+          <source src={BACKGROUND_VIDEOS[0]} type="video/mp4" />
         </video>
         <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
