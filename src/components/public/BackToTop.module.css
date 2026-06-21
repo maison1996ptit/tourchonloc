@@ -1,7 +1,7 @@
 .backToTop {
   position: fixed;
   bottom: 30px;
-  right: 30px;
+  right: 34px;
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -38,4 +38,11 @@
 .backToTopIcon {
   font-size: 1.1rem;
   line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .backToTop {
+    bottom: 20px;
+    right: 21.5px;
+  }
 }

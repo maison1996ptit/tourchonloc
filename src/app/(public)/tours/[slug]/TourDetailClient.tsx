@@ -21,6 +21,7 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
   const [loading, setLoading] = useState(!initialTour);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showStickyBadge, setShowStickyBadge] = useState(false);
+  const [shouldShiftBadgeUp, setShouldShiftBadgeUp] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [activeDay, setActiveDay] = useState<number | null>(1);
   
@@ -99,6 +100,13 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
       } else {
         setShowStickyBadge(true);
       }
+
+      // Check if we need to shift the badge up because chatbot shifted up
+      if (window.scrollY > 500) {
+        setShouldShiftBadgeUp(true);
+      } else {
+        setShouldShiftBadgeUp(false);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -140,7 +148,7 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
   const BookingBadge = ({ isSticky = false, innerRef }: { isSticky?: boolean; innerRef?: React.RefObject<HTMLDivElement | null> }) => (
     <div 
       ref={innerRef}
-      className={`${styles.bookingBadge} ${isSticky ? styles.stickyBadge : ''}`}
+      className={`${styles.bookingBadge} ${isSticky ? styles.stickyBadge : ''} ${isSticky && shouldShiftBadgeUp ? styles.shiftedUp : ''}`}
       onClick={() => setIsModalOpen(true)}
     >
       <div className={styles.badgeIcon}>
