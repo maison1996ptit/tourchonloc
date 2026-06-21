@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Montserrat, Caveat, Playfair_Display, Lora } from "next/font/google";
+import { Inter, Caveat, Playfair_Display, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/hooks/useLanguage";
 
-const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin", "vietnamese"], variable: "--font-body", weight: ['300', '400', '500', '600', '700', '800'] });
-const montserrat = Montserrat({ subsets: ["latin", "vietnamese"], variable: "--font-heading", weight: ['400', '500', '600', '700', '800', '900'] });
+const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-inter", weight: ['300', '400', '500', '600', '700', '800', '900'] });
 const caveat = Caveat({ subsets: ["latin"], variable: "--font-accent", weight: ['400', '700'] });
 
 // Import high-quality editorial Serif fonts with Vietnamese subset
@@ -25,7 +24,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: "Tour Chọn Lọc - Luôn mang lại giá trị cốt lõi",
-  description: "Trải nghiệm thế giới theo phong cách riêng với các tour du lịch bản sắc của chúng tôi.",
+  description: "Trải nghiệm thế giới theo phong cách riêng with các tour du lịch bản sắc của chúng tôi.",
 };
 
 export default function RootLayout({
@@ -35,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <body className={`${plusJakarta.variable} ${montserrat.variable} ${caveat.variable} ${playfair.variable} ${lora.variable}`}>
+      <body className={`${inter.variable} ${caveat.variable} ${playfair.variable} ${lora.variable}`}>
         <AuthProvider>
           <LanguageProvider>
             <ThemeProvider>

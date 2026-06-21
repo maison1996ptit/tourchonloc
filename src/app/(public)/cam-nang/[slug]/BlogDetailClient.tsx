@@ -76,31 +76,55 @@ export default function BlogDetailClient({ initialBlog, relatedBlogs = [], allTo
 
     if (!allTours || allTours.length === 0) return null;
 
-    // 2. Match by country field
-    if (initialBlog?.country) {
-      const targetCountry = initialBlog.country.toLowerCase();
-      const matched = allTours.filter(t => 
-        t.destination.toLowerCase().includes(targetCountry) || 
-        t.title.toLowerCase().includes(targetCountry)
-      );
-      if (matched.length > 0) return matched[0];
-    }
+    // Normalize helper
+    const normalizeStr = (str: string) => 
+      str ? str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9\s]/g, '').trim() : '';
 
-    // 3. Match by keywords in title
-    const titleLower = (initialBlog?.title || '').toLowerCase();
-    const keywords = ['hàn quốc', 'nhật bản', 'hồng kông', 'trung quốc', 'singapore', 'thái lan', 'đài loan', 'châu âu', 'pháp', 'úc', 'mỹ'];
-    for (const keyword of keywords) {
-      if (titleLower.includes(keyword)) {
-        const matched = allTours.filter(t => 
-          t.destination.toLowerCase().includes(keyword) || 
-          t.title.toLowerCase().includes(keyword)
-        );
+    // 2. Match by country field of the article
+    if (initialBlog?.country) {
+      const targetCountryNorm = normalizeStr(initialBlog.country);
+      if (targetCountryNorm) {
+        const matched = allTours.filter(t => {
+          const destNorm = normalizeStr(t.destination);
+          const titleNorm = normalizeStr(t.title);
+          return destNorm.includes(targetCountryNorm) || titleNorm.includes(targetCountryNorm);
+        });
         if (matched.length > 0) return matched[0];
       }
     }
 
-    // 4. Default fallback
-    return allTours[0];
+    // 3. Match by keywords in the article's title, excerpt, slug, or tags
+    const textToMatch = `${initialBlog?.title || ''} ${initialBlog?.excerpt || ''} ${initialBlog?.slug || ''} ${(initialBlog?.tags || []).join(' ')}`;
+    const textNorm = normalizeStr(textToMatch);
+
+    // List of key destinations with their search queries
+    const destinationKeywords = [
+      { name: 'Hàn Quốc', search: 'han quoc' },
+      { name: 'Nhật Bản', search: 'nhat ban' },
+      { name: 'Đài Loan', search: 'dai loan' },
+      { name: 'Trung Quốc', search: 'trung quoc' },
+      { name: 'Singapore', search: 'singapore' },
+      { name: 'Hồng Kông', search: 'hong kong' },
+      { name: 'Thái Lan', search: 'thai lan' },
+      { name: 'Pháp', search: 'phap' },
+      { name: 'Úc', search: 'uc' },
+      { name: 'Mỹ', search: 'my' }
+    ];
+
+    for (const kw of destinationKeywords) {
+      if (textNorm.includes(kw.search)) {
+        // Find if we have a tour for this destination
+        const matched = allTours.filter(t => {
+          const destNorm = normalizeStr(t.destination);
+          const titleNorm = normalizeStr(t.title);
+          return destNorm.includes(kw.search) || titleNorm.includes(kw.search);
+        });
+        if (matched.length > 0) return matched[0];
+      }
+    }
+
+    // No genuine match found, do not fall back to general tours
+    return null;
   }, [initialBlog, allTours]);
 
   // 1. User View Tracking API call on mount

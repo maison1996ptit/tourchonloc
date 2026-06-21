@@ -59,7 +59,7 @@
 .header h1 {
   font-size: 2.8rem;
   font-weight: 900;
-  line-height: 1.2;
+  line-height: 1.35;
   margin: 0 0 15px 0;
   color: #0f172a;
   font-family: var(--font-heading);
@@ -67,6 +67,7 @@
   background: linear-gradient(135deg, #0f172a 30%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  padding: 10px 0;
 }
 
 /* Metadata Capsule Badges */
@@ -415,12 +416,35 @@
 
 /* Departure Dates Ticket Cards */
 .dateGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  display: flex;
   gap: 20px;
+  overflow-x: auto;
+  padding: 10px 5px 20px 5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dateGrid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.dateGrid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.dateGrid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.dateGrid::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
 }
 
 .dateCard {
+  flex: 0 0 260px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
@@ -462,17 +486,53 @@
   letter-spacing: 0.5px;
 }
 
+.urgencyAlert {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.infoIcon {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.dateDayOfWeek {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: capitalize;
+  margin-bottom: 5px;
+}
+
 .spotsLeft {
-  font-size: 0.75rem;
-  color: #b91c1c;
+  font-size: 0.8rem;
   font-weight: 800;
   text-align: center;
-  background: #fef2f2;
   padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid #fee2e2;
+  border-radius: 8px;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 12px;
+}
+
+.statusConfirmed {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.statusOpen {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
 }
 
 .bookDateBtn {
@@ -1014,8 +1074,5 @@
   .trustBanner {
     grid-template-columns: 1fr;
     padding: 15px;
-  }
-  .dateGrid {
-    grid-template-columns: 1fr;
   }
 }

@@ -175,46 +175,7 @@ export default function BlogsPageClient({ initialBlogs, initialTours = [] }: Blo
     currentPage * itemsPerPage
   );
 
-  // 10-second Promo Popup Timer
-  const [showPromo, setShowPromo] = useState(false);
 
-  useEffect(() => {
-    // Set 3 seconds timer
-    const timer = setTimeout(() => {
-      setShowPromo(true);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Context-aware matched tour logic (related to user's browsing country)
-  const matchedTour = useMemo(() => {
-    if (!initialTours || initialTours.length === 0) return null;
-
-    // 1. Match selected country filter
-    if (selectedCountry !== 'All') {
-      const targetCountry = selectedCountry.toLowerCase();
-      const filtered = initialTours.filter(t => 
-        t.destination.toLowerCase().includes(targetCountry) || 
-        t.title.toLowerCase().includes(targetCountry)
-      );
-      if (filtered.length > 0) return filtered[0];
-    }
-
-    // 2. Match country of featured post or first post on screen
-    const currentPostCountry = featuredPost?.country || paginatedPosts[0]?.country;
-    if (currentPostCountry) {
-      const targetCountry = currentPostCountry.toLowerCase();
-      const filtered = initialTours.filter(t => 
-        t.destination.toLowerCase().includes(targetCountry) || 
-        t.title.toLowerCase().includes(targetCountry)
-      );
-      if (filtered.length > 0) return filtered[0];
-    }
-
-    // 3. Fallback to first available tour
-    return initialTours[0];
-  }, [initialTours, selectedCountry, featuredPost, paginatedPosts]);
 
   const resetFilters = () => {
     setSearchQuery('');
@@ -415,46 +376,7 @@ export default function BlogsPageClient({ initialBlogs, initialTours = [] }: Blo
         </>
       )}
 
-      {/* Dynamic Contextual Tour Promotion Popup */}
-      {showPromo && matchedTour && (
-        <div className={styles.promoPopup}>
-          <div className={styles.promoContent}>
-            <button 
-              className={styles.promoClose} 
-              onClick={() => {
-                setShowPromo(false);
-              }}
-              aria-label="Đóng quảng cáo"
-            >
-              ✕
-            </button>
-            <div className={styles.promoImageWrapper}>
-              <div 
-                className={styles.promoImage} 
-                style={{ backgroundImage: `url(${matchedTour.featuredImage || '/images/default-tour.jpg'})` }}
-              />
-              <span className={styles.promoTag}>🔥 BÁN CHẠY</span>
-            </div>
-            <div className={styles.promoBody}>
-              <span className={styles.promoLabel}>📍 GỢI Ý HÀNH TRÌNH CHO BẠN</span>
-              <h4 className={styles.promoTitle}>{matchedTour.title}</h4>
-              <div className={styles.promoDetails}>
-                <span>⏳ Thời gian: {matchedTour.durationDays} ngày {matchedTour.durationNights} đêm</span>
-                <span>🏷️ Giá từ: <strong className={styles.promoPrice}>{matchedTour.priceFrom.toLocaleString('vi-VN')} đ</strong></span>
-              </div>
-              <Link 
-                href={`/tours/${matchedTour.slug}`} 
-                className={styles.promoCta}
-                onClick={() => {
-                  setShowPromo(false);
-                }}
-              >
-                Khám phá ngay →
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

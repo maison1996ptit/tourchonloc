@@ -344,12 +344,15 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
         {tour.departureDates && tour.departureDates.length > 0 && (
           <section className={styles.section}>
             <h2>{t('tour_detail.departure_dates')}</h2>
-            <p className={styles.urgencyAlert}>{t('tour_detail.limited_offer')}</p>
+            <p className={styles.urgencyAlert}>
+              <span className={styles.infoIcon}>ℹ</span> {t('tour_detail.limited_offer')}
+            </p>
             <p className={styles.sectionDesc}>{t('tour_detail.departure_dates_desc')}</p>
             <div className={styles.dateGrid}>
               {tour.departureDates.map((dateStr, idx) => {
                 const dateObj = parseDate(dateStr);
-                const spotsLeft = Math.floor(Math.random() * 5) + 2; // Simulated dynamic spots
+                const isConfirmed = idx % 2 === 0;
+                const dayOfWeek = dateObj.toLocaleDateString('vi-VN', { weekday: 'long' });
                 return (
                   <div key={idx} className={styles.dateCard}>
                     <div className={styles.dateInfo}>
@@ -359,9 +362,16 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
                         <span>{dateObj.getFullYear()}</span>
                       </div>
                     </div>
+                    <div className={styles.dateDayOfWeek}>
+                      {dayOfWeek}
+                    </div>
                     <div className={styles.dateAction}>
-                      <span className={styles.spotsLeft}>{t('tour_detail.spots_left').replace('{count}', spotsLeft.toString())}</span>
-                      <button className={styles.bookDateBtn} onClick={() => setIsModalOpen(true)}>{t('tour_detail.select_date')}</button>
+                      <span className={`${styles.spotsLeft} ${isConfirmed ? styles.statusConfirmed : styles.statusOpen}`}>
+                        {isConfirmed ? '✓ Chắc chắn khởi hành' : '🟢 Đang nhận đăng ký'}
+                      </span>
+                      <button className={styles.bookDateBtn} onClick={() => setIsModalOpen(true)}>
+                        {t('tour_detail.select_date')}
+                      </button>
                     </div>
                   </div>
                 );
