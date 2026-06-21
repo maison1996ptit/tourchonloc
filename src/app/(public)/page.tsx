@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Tour Chọn Lọc | Cẩm Nang Du Lịch & Tour Cao Cấp Tinh Hoa',
     description: 'Bản đồ du lịch với hơn 100+ địa danh nổi bật toàn thế giới cùng các tour du lịch sang trọng, tinh hoa được sàng lọc kỹ càng.',
-    url: 'https://travelapp.com',
+    url: 'https://tourchonloc.com',
     type: 'website',
     images: [
       {

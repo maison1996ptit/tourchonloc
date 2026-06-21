@@ -1,13 +1,25 @@
 import type { Metadata } from "next";
-import { Raleway, Caveat } from "next/font/google";
+import { Plus_Jakarta_Sans, Montserrat, Caveat, Playfair_Display, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/hooks/useLanguage";
 
-const ralewayBody = Raleway({ subsets: ["latin", "vietnamese"], variable: "--font-body", weight: ['300', '400', '500', '600', '700'] });
-const ralewayHeading = Raleway({ subsets: ["latin", "vietnamese"], variable: "--font-heading", weight: ['400', '500', '600', '700', '800', '900'] });
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin", "vietnamese"], variable: "--font-body", weight: ['300', '400', '500', '600', '700', '800'] });
+const montserrat = Montserrat({ subsets: ["latin", "vietnamese"], variable: "--font-heading", weight: ['400', '500', '600', '700', '800', '900'] });
 const caveat = Caveat({ subsets: ["latin"], variable: "--font-accent", weight: ['400', '700'] });
+
+// Import high-quality editorial Serif fonts with Vietnamese subset
+const playfair = Playfair_Display({ 
+  subsets: ["latin", "vietnamese"], 
+  variable: "--font-serif-heading", 
+  weight: ['400', '500', '600', '700'] 
+});
+const lora = Lora({ 
+  subsets: ["latin", "vietnamese"], 
+  variable: "--font-serif-body", 
+  weight: ['400', '500', '600', '700'] 
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -22,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${ralewayBody.variable} ${ralewayHeading.variable} ${caveat.variable}`}>
+    <html lang="vi" suppressHydrationWarning>
+      <body className={`${plusJakarta.variable} ${montserrat.variable} ${caveat.variable} ${playfair.variable} ${lora.variable}`}>
         <AuthProvider>
           <LanguageProvider>
             <ThemeProvider>

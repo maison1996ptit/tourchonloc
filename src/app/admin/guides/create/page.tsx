@@ -1,8 +1,12 @@
 'use client';
 
-import React from 'react';
-import GuideForm from '@/components/admin/GuideForm';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function CreateGuidePage() {
-  return <GuideForm isEdit={false} />;
+export default function CreateGuideRedirect() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/admin/blogs/create');
+  }, [router]);
+  return null;
 }

@@ -64,7 +64,7 @@ const blogs = [
     title: "Bí Quyết Săn Sale Du Lịch: Đừng Để Giá Cả Cản Trở Chuyến Đi!",
     slug: "bi-quyet-san-sale-du-lich",
     isMemo: true,
-    coverImage: "/images/memos/sale-cover.jpg",
+    coverImage: "/images/about-bg.jpg",
     memoContent: {
       hook: "Bạn có biết? Hàng ngàn chuyến du lịch trong mơ đang có giá tốt hơn bạn nghĩ. Vấn đề chỉ là bạn chưa biết cách 'săn' chúng một cách khoa học.",
       problem: "Bạn thường xuyên bỏ lỡ các đợt khuyến mãi? Bạn thấy một tour 'giảm giá' nhưng lại sợ 'của rẻ là của ôi', không biết chất lượng có đảm bảo? Bạn tốn hàng giờ để so sánh giá nhưng vẫn không chắc mình đã có lựa chọn tốt nhất?",
@@ -90,7 +90,7 @@ const blogs = [
     title: "Lập Trình Chuyến Đi Hoàn Hảo: Biến Ước Mơ Thành Kế Hoạch",
     slug: "lap-trinh-chuyen-di-hoan-hao",
     isMemo: true,
-    coverImage: "/images/memos/planning-cover.jpg",
+    coverImage: "/images/about-bg.jpg",
     memoContent: {
       hook: "Một chuyến đi hoàn hảo không tự nhiên mà có. Nó được 'kiến trúc' và 'lập trình' một cách khoa học, tỉ mỉ đến từng chi tiết.",
       problem: "Bạn cảm thấy choáng ngợp trước hàng tá việc cần chuẩn bị: đặt vé, chọn khách sạn, lên lịch trình, dự trù kinh phí? Bạn sợ bỏ sót những điểm đến thú vị hoặc gặp phải những vấn đề không lường trước?",

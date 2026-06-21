@@ -6,7 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { CountryGuideMap, RegionMarker } from '@/types/guideMap';
 import { Blog } from '@/types/blog';
-import { blogService } from '@/services/blogService';
+// Removed blogService import as blogs are unified with guides
 import styles from '@/app/(public)/cam-nang/guides.module.css';
 import { getMarkerDetailContent } from '@/actions/guideActions';
 
@@ -30,7 +30,7 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
   const [isActive, setIsActive] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>(countryMap.center);
-  const listRef = useRef<HTMLDivElement>(null);
+  const [showAllMarkers, setShowAllMarkers] = useState(false);
   const cacheBuster = useRef(Date.now()).current;
 
   const [selectedMarker, setSelectedMarker] = useState<RegionMarker | null>(null);
@@ -72,10 +72,29 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
     const fetchBlog = async () => {
       if (selectedMarker) {
         try {
-          const blog = await blogService.getBlogBySlug(selectedMarker.contentSlug);
-          setRelatedBlog(blog || null);
+          const res = await fetch(`/api/guides/${selectedMarker.contentSlug}`);
+          if (res.ok) {
+            const guide = await res.json();
+            setRelatedBlog({
+              id: guide.id,
+              title: guide.title,
+              slug: guide.slug,
+              thumbnail: guide.coverImage || guide.thumbnail || '',
+              excerpt: guide.excerpt,
+              content: '',
+              tags: guide.tags?.map((t: any) => t.name) || [],
+              status: guide.status === 'Published' ? 'Published' : 'Draft',
+              publishedDate: (guide.publishedAt || guide.createdAt),
+              createdAt: guide.createdAt,
+              updatedAt: guide.updatedAt,
+              categoryId: guide.categoryId || 'cam-nang'
+            } as any);
+          } else {
+            setRelatedBlog(null);
+          }
         } catch (error) {
           console.error("DEBUG: Blog fetch error", error);
+          setRelatedBlog(null);
         }
       }
     };
@@ -87,15 +106,6 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
     setMapCenter([marker.lat, marker.lng]);
     setSelectedMarker(marker);
     setShowModal(true);
-    
-    // Sync list scroll
-    const element = document.getElementById(`dest-${marker.id}`);
-    if (element && listRef.current) {
-      listRef.current.scrollTo({
-        left: element.offsetLeft - 60,
-        behavior: 'smooth'
-      });
-    }
     onMarkerClick(marker);
   };
 
@@ -104,28 +114,12 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
     setMapCenter([marker.lat, marker.lng]);
     setIsActive(true);
     setSelectedMarker(marker);
-    
-    const element = document.getElementById(`dest-${marker.id}`);
-    if (element && listRef.current) {
-      listRef.current.scrollTo({
-        left: element.offsetLeft - 60,
-        behavior: 'smooth'
-      });
-    }
   };
 
   const openDetail = (e: React.MouseEvent, marker: RegionMarker) => {
     e.stopPropagation();
     setSelectedMarker(marker);
     setShowModal(true);
-  };
-
-  const scrollNext = () => {
-    if (listRef.current) listRef.current.scrollBy({ left: 235, behavior: 'smooth' });
-  };
-
-  const scrollPrev = () => {
-    if (listRef.current) listRef.current.scrollBy({ left: -235, behavior: 'smooth' });
   };
 
   const getMascot = (marker: RegionMarker) => {
@@ -146,6 +140,12 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
              </div>`
     });
   };
+
+  const INITIAL_VISIBLE_COUNT = 8;
+  const isSearching = searchQuery.trim().length > 0;
+  const visibleMarkers = isSearching || showAllMarkers 
+    ? filteredMarkers 
+    : filteredMarkers.slice(0, INITIAL_VISIBLE_COUNT);
 
   return (
     <div className={styles.mapCard}>
@@ -220,25 +220,27 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
         </MapContainer>
       </div>
 
-      <div className={styles.listWrapper}>
-        <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={scrollPrev}>❮</button>
-        <div className={styles.destinationList} ref={listRef}>
-          {filteredMarkers.length > 0 ? (
-            filteredMarkers.map((marker) => (
+      <div className={styles.gridWrapper}>
+        <div className={styles.landmarkGrid}>
+          {visibleMarkers.length > 0 ? (
+            visibleMarkers.map((marker) => (
               <div 
                 key={marker.id} 
                 id={`dest-${marker.id}`}
-                className={`${styles.destinationItem} ${selectedId === marker.id ? styles.activeItem : ''}`}
+                className={`${styles.landmarkCard} ${selectedId === marker.id ? styles.activeLandmarkCard : ''}`}
                 onClick={() => handleItemClick(marker)}
-                style={{ 
-                  backgroundImage: `linear-gradient(to top, rgba(15, 32, 39, 0.9), transparent), url(${marker.imageUrl || '/logo.png'}?v=${cacheBuster})` 
-                }}
               >
-                <div className={styles.itemOverlay}>
-                  <div className={styles.itemBadge}>{getMascot(marker)}</div>
-                  <span className={styles.itemName}>{marker.name}</span>
-                  <p className={styles.itemDesc}>{marker.shortDescription}</p>
-                  <button className={styles.viewDetailBtn} onClick={(e) => openDetail(e, marker)}>
+                <div className={styles.landmarkCardImageWrapper}>
+                  <div 
+                    className={styles.landmarkCardImage}
+                    style={{ backgroundImage: `url(${marker.imageUrl || '/logo.png'}?v=${cacheBuster})` }}
+                  />
+                  <div className={styles.landmarkBadge}>{getMascot(marker)}</div>
+                </div>
+                <div className={styles.landmarkCardContent}>
+                  <h4 className={styles.landmarkName}>{marker.name}</h4>
+                  <p className={styles.landmarkDesc}>{marker.shortDescription}</p>
+                  <button className={styles.landmarkDetailBtn} onClick={(e) => openDetail(e, marker)}>
                     Xem chi tiết →
                   </button>
                 </div>
@@ -250,7 +252,20 @@ const GuideMapCard: React.FC<GuideMapCardProps> = ({ countryMap, onMarkerClick }
             </div>
           )}
         </div>
-        <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={scrollNext}>❯</button>
+
+        {filteredMarkers.length > INITIAL_VISIBLE_COUNT && !isSearching && (
+          <div className={styles.expandWrapper}>
+            <button 
+              className={styles.expandBtn}
+              onClick={() => setShowAllMarkers(!showAllMarkers)}
+            >
+              {showAllMarkers 
+                ? 'Thu gọn danh sách ▲' 
+                : `Xem tất cả ${filteredMarkers.length} địa điểm ▼`
+              }
+            </button>
+          </div>
+        )}
       </div>
 
       {showModal && selectedMarker && (

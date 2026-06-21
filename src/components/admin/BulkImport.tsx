@@ -87,7 +87,7 @@ const BulkImport: React.FC<BulkImportProps> = ({ onSuccess }) => {
           shortDescription: String(row['Short Description'] || ''),
           status: (row['Status'] === 'Published' || row['Status'] === 'Draft' || row['Status'] === 'Archived') ? row['Status'] : 'Draft',
           isFeatured: row['Is Featured'] === 'Yes',
-          featuredImage: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
+          featuredImage: '/images/guides/v1.jpg',
           images: [],
           overview: String(row['Short Description'] || ''),
           highlights: [],

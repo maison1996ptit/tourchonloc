@@ -5,7 +5,7 @@ export const mockSiteSettings: SiteSettings = {
   tagline: 'Khám phá thế giới theo cách của bạn',
   heroHeadline: 'Experience Authentic Travel Like Never Before',
   heroSubtitle: 'Tailor-made journeys for the discerning traveler.',
-  heroImage: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=2070',
+  heroImage: '/images/about-bg.jpg',
   heroCTA: {
     text: 'Plan Your Trip',
     link: '/customize-trip'

@@ -39,7 +39,7 @@ export default function Header() {
       <div className={styles.headerContainer}>
         <Link href="/" className={styles.logo}>
           <img 
-            src="/logo.png" 
+            src="/logo.png?v=2" 
             alt={settings?.websiteName || 'Tour Chọn Lọc'} 
             className={styles.logoImage}
             style={{ width: 'auto', height: 'auto' }}

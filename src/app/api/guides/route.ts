@@ -9,6 +9,9 @@ export async function GET(request: Request) {
     const search = searchParams.get('search') || '';
     const status = searchParams.get('status') || 'Published';
     const categorySlug = searchParams.get('category') || '';
+    const country = searchParams.get('country') || '';
+    const city = searchParams.get('city') || '';
+    const sortBy = searchParams.get('sortBy') || 'createdAt'; // 'createdAt' | 'views'
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const skip = (page - 1) * limit;
@@ -25,11 +28,27 @@ export async function GET(request: Request) {
       };
     }
 
+    if (country) {
+      whereClause.country = country;
+    }
+
+    if (city) {
+      whereClause.city = city;
+    }
+
     if (search) {
       whereClause.OR = [
         { title: { contains: search, mode: 'insensitive' } },
-        { excerpt: { contains: search, mode: 'insensitive' } }
+        { excerpt: { contains: search, mode: 'insensitive' } },
+        { tags: { some: { name: { contains: search, mode: 'insensitive' } } } }
       ];
+    }
+
+    const orderByClause: any = {};
+    if (sortBy === 'views') {
+      orderByClause.views = 'desc';
+    } else {
+      orderByClause.createdAt = 'desc';
     }
 
     const [total, data] = await Promise.all([
@@ -39,9 +58,17 @@ export async function GET(request: Request) {
         include: {
           category: true,
           tags: true,
-          seo: true
+          seo: true,
+          relatedTours: {
+            include: {
+              tour: true
+            }
+          },
+          faqs: {
+            orderBy: { order: 'asc' }
+          }
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: orderByClause,
         skip,
         take: limit
       })
@@ -72,7 +99,22 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, slug, excerpt, coverImage, status, categoryId, tagIds = [], seo = {}, blocks = [] } = body;
+    const { 
+      title, 
+      slug, 
+      excerpt, 
+      coverImage, 
+      thumbnail = '', 
+      country = '', 
+      city = '', 
+      status, 
+      categoryId, 
+      tagIds = [], 
+      seo = {}, 
+      blocks = [],
+      relatedTourIds = [],
+      faqs = []
+    } = body;
 
     if (!title || !slug || !excerpt || !coverImage) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -94,6 +136,9 @@ export async function POST(request: Request) {
           slug,
           excerpt,
           coverImage,
+          thumbnail: thumbnail || null,
+          country: country || null,
+          city: city || null,
           status: status as GuideStatus,
           publishedAt: status === 'Published' ? new Date() : null,
           categoryId: categoryId || null,
@@ -136,6 +181,33 @@ export async function POST(request: Request) {
         }
       }
 
+      // 4. Create related tours if provided
+      if (relatedTourIds && relatedTourIds.length > 0) {
+        for (let i = 0; i < relatedTourIds.length; i++) {
+          await tx.guideRelatedTour.create({
+            data: {
+              guideId: guide.id,
+              tourId: relatedTourIds[i],
+              order: i
+            }
+          });
+        }
+      }
+
+      // 5. Create FAQs if provided
+      if (faqs && faqs.length > 0) {
+        for (let i = 0; i < faqs.length; i++) {
+          await tx.guideFAQ.create({
+            data: {
+              guideId: guide.id,
+              question: faqs[i].question,
+              answer: faqs[i].answer,
+              order: i
+            }
+          });
+        }
+      }
+
       return tx.guide.findUnique({
         where: { id: guide.id },
         include: {
@@ -143,6 +215,14 @@ export async function POST(request: Request) {
           tags: true,
           seo: true,
           blocks: {
+            orderBy: { order: 'asc' }
+          },
+          relatedTours: {
+            include: {
+              tour: true
+            }
+          },
+          faqs: {
             orderBy: { order: 'asc' }
           }
         }

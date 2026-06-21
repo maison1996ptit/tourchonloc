@@ -65,6 +65,30 @@ export interface TimelineBlockContent {
   items: TimelineItem[];
 }
 
+export interface InfoBoxBlockContent {
+  title: string;
+  text: string;
+  type: 'warning' | 'tip' | 'info';
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface FAQBlockContent {
+  items: FAQItem[];
+}
+
+export interface TourRelatedBlockContent {
+  tourId: string;
+  customTitle?: string;
+}
+
+export interface DividerBlockContent {
+  style: 'solid' | 'dashed' | 'double' | 'none';
+}
+
 export type GuideBlockContent = 
   | TextBlockContent 
   | ImageBlockContent 
@@ -72,16 +96,43 @@ export type GuideBlockContent =
   | QuoteBlockContent 
   | VideoBlockContent 
   | CTABlockContent 
-  | TimelineBlockContent;
+  | TimelineBlockContent
+  | InfoBoxBlockContent
+  | FAQBlockContent
+  | TourRelatedBlockContent
+  | DividerBlockContent;
 
 export interface GuideBlock {
   id: string;
   guideId: string;
-  type: 'Text' | 'Image' | 'Gallery' | 'Quote' | 'Video' | 'CTA' | 'Timeline';
+  type: 'Text' | 'Image' | 'Gallery' | 'Quote' | 'Video' | 'CTA' | 'Timeline' | 'InfoBox' | 'FAQ' | 'TourRelated' | 'Divider';
   order: number;
   content: GuideBlockContent;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface GuideRelatedTour {
+  id: string;
+  guideId: string;
+  tourId: string;
+  tour?: {
+    id: string;
+    title: string;
+    slug: string;
+    priceFrom: number;
+    durationDays: number;
+    durationNights: number;
+    featuredImage: string;
+  };
+}
+
+export interface GuideFAQ {
+  id: string;
+  guideId: string;
+  question: string;
+  answer: string;
+  order: number;
 }
 
 export interface Guide {
@@ -90,7 +141,11 @@ export interface Guide {
   slug: string;
   excerpt: string;
   coverImage: string;
+  thumbnail?: string | null;
+  country?: string | null;
+  city?: string | null;
   status: GuideStatus;
+  views: number;
   publishedAt?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -99,4 +154,15 @@ export interface Guide {
   tags?: GuideTag[];
   seo?: GuideSEO | null;
   blocks?: GuideBlock[];
+  relatedTours?: GuideRelatedTour[];
+  faqs?: GuideFAQ[];
+}
+
+export interface GuideMedia {
+  id: string;
+  url: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  createdAt: string;
 }

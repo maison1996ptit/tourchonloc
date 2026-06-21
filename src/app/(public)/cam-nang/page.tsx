@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { blogService } from '@/services/blogService';
 import { prisma } from '@/lib/prisma';
 import CamNangPageClient from './CamNangPageClient';
 
@@ -10,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Tin Tức & Cẩm Nang Du Lịch | Tour Chọn Lọc',
     description: 'Cập nhật tin tức du lịch mới nhất, kinh nghiệm đi tour và cẩm nang từ chuyên gia.',
-    url: 'https://travelapp.com/cam-nang',
+    url: 'https://tourchonloc.com/cam-nang',
     type: 'website',
     images: [
       {
@@ -23,41 +22,82 @@ export const metadata: Metadata = {
   }
 };
 
-export default async function BlogsPage() {
-  // Fetch all blogs from database
-  const allBlogs = await blogService.getBlogs();
-  const publishedBlogs = allBlogs.filter(b => b.status === 'Published');
+function estimateReadingTime(blocks: any[]) {
+  if (!blocks || blocks.length === 0) return 3;
+  let wordCount = 0;
+  blocks.forEach(block => {
+    if (block.type === 'Text') {
+      const text = (block.content as any)?.text || '';
+      wordCount += text.trim().split(/\s+/).length || 0;
+    }
+  });
+  // Average reading speed: 200 words per minute
+  return Math.max(1, Math.ceil(wordCount / 200));
+}
 
-  // Fetch all guides from database
+export default async function BlogsPage() {
+  // Fetch all guides from database (which now includes all migrated blogs and memos)
   const allGuides = await prisma.guide.findMany({
     where: { status: 'Published' },
-    include: { category: true }
+    include: { 
+      category: true,
+      tags: true,
+      blocks: true,
+      relatedTours: true
+    },
+    orderBy: {
+      publishedAt: 'desc'
+    }
   });
 
-  const mappedGuides = allGuides.map(g => ({
-    id: g.id,
-    title: g.title,
-    slug: g.slug,
-    categoryId: g.categoryId || 'cam-nang',
-    category: g.category?.name || 'Cẩm nang du lịch',
-    author: 'Chuyên gia Tour Chọn Lọc',
-    thumbnail: g.coverImage,
-    excerpt: g.excerpt,
-    content: '',
-    seoTitle: g.title,
-    seoDescription: g.excerpt,
-    tags: [],
-    publishedDate: (g.publishedAt || g.createdAt).toISOString(),
-    status: 'Published' as const,
-    createdAt: g.createdAt.toISOString(),
-    updatedAt: g.updatedAt.toISOString(),
-    isMemo: true // Trigger magazine storytelling renderer style
-  }));
+  // Fetch all published tours for the contextual promo popup
+  const activeTours = await prisma.tour.findMany({
+    where: { status: 'Published' },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      destination: true,
+      priceFrom: true,
+      durationDays: true,
+      durationNights: true,
+      featuredImage: true,
+      departureDates: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
 
-  // Combine and sort by date descending
-  const combined = [...publishedBlogs, ...mappedGuides].sort(
-    (a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
-  );
+  const mappedGuides = allGuides.map(g => {
+    const readTime = estimateReadingTime(g.blocks);
+    const hasTours = g.relatedTours && g.relatedTours.length > 0;
+    
+    return {
+      id: g.id,
+      title: g.title,
+      slug: g.slug,
+      categoryId: g.categoryId || 'cam-nang',
+      category: g.category?.name || 'Cẩm nang du lịch',
+      author: 'Chuyên gia Tour Chọn Lọc',
+      thumbnail: g.coverImage,
+      excerpt: g.excerpt,
+      content: '', // not needed for list preview
+      seoTitle: g.title,
+      seoDescription: g.excerpt,
+      tags: g.tags.map(t => t.name),
+      publishedDate: (g.publishedAt || g.createdAt).toISOString(),
+      status: 'Published' as const,
+      createdAt: g.createdAt.toISOString(),
+      updatedAt: g.updatedAt.toISOString(),
+      isGuide: true,
+      views: g.views,
+      country: g.country || '',
+      city: g.city || '',
+      readTime,
+      hasTours
+    };
+  });
 
-  return <CamNangPageClient initialBlogs={combined} />;
+  return <CamNangPageClient initialBlogs={mappedGuides as any[]} initialTours={activeTours as any[]} />;
 }

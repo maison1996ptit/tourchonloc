@@ -1,0 +1,41 @@
+.backToTop {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(15px);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  outline: none;
+}
+
+.backToTopVisible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.backToTop:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  transform: translateY(-4px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.backToTopIcon {
+  font-size: 1.1rem;
+  line-height: 1;
+}

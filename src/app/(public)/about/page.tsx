@@ -1,7 +1,18 @@
-'use client';
-
 import React from 'react';
+import { Metadata } from 'next';
 import styles from './about.module.css';
+
+export const metadata: Metadata = {
+  title: 'Giới Thiệu Về Hệ Sinh Thái Tour Chọn Lọc | Kiến Tạo Hành Trình Độc Bản',
+  description: 'Tìm hiểu về sứ mệnh và hệ sinh thái Tour Chọn Lọc. Chúng tôi mang đến những hành trình du lịch cao cấp, độc bản với tri thức thực chiến và chất lượng dịch vụ khắt khe nhất.',
+  keywords: ['giới thiệu tour chọn lọc', 'về chúng tôi', 'thương hiệu tour chọn lọc', 'du lịch độc bản', 'tour cao cấp'],
+  openGraph: {
+    title: 'Giới Thiệu Về Hệ Sinh Thái Tour Chọn Lọc | Kiến Tạo Hành Trình Độc Bản',
+    description: 'Tìm hiểu về sứ mệnh và hệ sinh thái Tour Chọn Lọc - Nhà sàng lọc tinh hoa lữ hành.',
+    url: 'https://tourchonloc.com/about',
+    type: 'website',
+  }
+};
 
 export default function AboutPage() {
   return (

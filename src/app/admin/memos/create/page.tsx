@@ -1,8 +1,12 @@
 'use client';
 
-import React from 'react';
-import MemoForm from '@/components/admin/MemoForm';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function CreateMemoPage() {
-  return <MemoForm isEdit={false} />;
+export default function CreateMemoRedirect() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/admin/blogs/create');
+  }, [router]);
+  return null;
 }

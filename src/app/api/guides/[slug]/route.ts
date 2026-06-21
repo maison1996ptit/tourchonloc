@@ -16,6 +16,14 @@ export async function GET(
         seo: true,
         blocks: {
           orderBy: { order: 'asc' }
+        },
+        relatedTours: {
+          include: {
+            tour: true
+          }
+        },
+        faqs: {
+          orderBy: { order: 'asc' }
         }
       }
     });

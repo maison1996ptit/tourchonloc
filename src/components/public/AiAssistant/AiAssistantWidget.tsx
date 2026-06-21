@@ -49,6 +49,25 @@ export default function AiAssistantWidget() {
     }
   }, [messages, isLoading]);
 
+  const [shouldShiftUp, setShouldShiftUp] = useState(false);
+
+  // Dynamic vertical shifting based on Back to Top visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      const backToTopBtn = document.querySelector('[class*="backToTop"]');
+      if (backToTopBtn && window.scrollY > 500) {
+        setShouldShiftUp(true);
+      } else {
+        setShouldShiftUp(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleSend = async (text: string) => {
     if (!text.trim() || isLoading) return;
 
@@ -162,7 +181,7 @@ export default function AiAssistantWidget() {
   ];
 
   return (
-    <div className={styles.widgetContainer}>
+    <div className={`${styles.widgetContainer} ${shouldShiftUp ? styles.shiftedUp : ''}`}>
       {/* Floating Toggle Button */}
       <button 
         className={`${styles.toggleButton} ${isOpen ? styles.toggleButtonActive : ''}`} 

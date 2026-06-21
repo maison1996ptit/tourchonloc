@@ -1,5 +1,8 @@
-import BlogForm from '@/components/admin/BlogForm';
+'use client';
+
+import React from 'react';
+import GuideForm from '@/components/admin/GuideForm';
 
 export default function CreateBlogPage() {
-  return <BlogForm />;
+  return <GuideForm isEdit={false} />;
 }

@@ -54,7 +54,7 @@
 .footerLogo {
   height: 50px;
   width: auto;
-  filter: brightness(0) invert(1); /* Make logo white for dark footer if needed */
+  /* filter: brightness(0) invert(1); */ /* Preserve logo original colors and style */
   object-fit: contain;
 }
 

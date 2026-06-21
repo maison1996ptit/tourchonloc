@@ -342,7 +342,7 @@ async function searchMultipleLandmarkImages(
     }
   }
 
-  const featuredImage = urls[0] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200';
+  const featuredImage = urls[0] || '/images/guides/v1.jpg';
   if (urls.length === 0) {
     urls.push(featuredImage);
   }
@@ -520,7 +520,7 @@ Cấu trúc JSON trả về BẮT BUỘC:
         console.log(`Matched featured image URL: ${imageResult.featuredImage} and gallery count: ${imageResult.images.length}`);
       } catch (imgErr) {
         console.error('Failed to fetch images for tour destinations:', imgErr);
-        parsedData.featuredImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200';
+        parsedData.featuredImage = '/images/guides/v1.jpg';
         parsedData.images = [parsedData.featuredImage];
       }
 

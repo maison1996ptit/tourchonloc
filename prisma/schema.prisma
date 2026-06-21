@@ -33,9 +33,10 @@ model Tour {
   status           String   @default("Published")
   images           String[]
   featuredImage    String
-  isFeatured       Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  isFeatured       Boolean            @default(false)
+  relatedGuides    GuideRelatedTour[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
 
 model Blog {
@@ -221,29 +222,36 @@ model VisaStats {
 }
 
 model Guide {
-  id            String         @id @default(cuid())
+  id            String             @id @default(cuid())
   title         String
-  slug          String         @unique
+  slug          String             @unique
   excerpt       String
   coverImage    String
-  status        String         @default("Draft") // "Draft", "Published", "Scheduled"
+  thumbnail     String?            // Ảnh nhỏ đại diện
+  country       String?            // Quốc gia phục vụ bộ lọc
+  city          String?            // Thành phố phục vụ bộ lọc
+  status        String             @default("Draft") // "Draft", "Published", "Scheduled"
+  views         Int                @default(0) // Số lượt xem lưu trực tiếp để sort nhanh
   publishedAt   DateTime?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
   
   categoryId    String?
-  category      GuideCategory? @relation(fields: [categoryId], references: [id])
+  category      GuideCategory?     @relation(fields: [categoryId], references: [id])
   
-  tags          GuideTag[]     @relation("GuideToTag")
+  tags          GuideTag[]         @relation("GuideToTag")
   seo           GuideSEO?
   blocks        GuideBlock[]
+  viewsList     GuideViews[]
+  relatedTours  GuideRelatedTour[]
+  faqs          GuideFAQ[]
 }
 
 model GuideBlock {
   id          String   @id @default(cuid())
   guideId     String
   guide       Guide    @relation(fields: [guideId], references: [id], onDelete: Cascade)
-  type        String   // "Text", "Image", "Gallery", "Quote", "Video", "CTA", "Timeline"
+  type        String   // "Text", "Image", "Gallery", "Quote", "Video", "CTA", "Timeline", "InfoBox", "FAQ", "TourRelated", "Divider"
   order       Int      // Thứ tự sắp xếp các block
   content     Json     // Nội dung của block
   createdAt   DateTime @default(now())
@@ -284,4 +292,42 @@ model GuideSEO {
   twitterImage       String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+model GuideViews {
+  id        String   @id @default(cuid())
+  guideId   String
+  guide     Guide    @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model GuideRelatedTour {
+  id      String @id @default(cuid())
+  guideId String
+  guide   Guide  @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  tourId  String
+  tour    Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  order   Int    @default(0)
+  
+  @@unique([guideId, tourId])
+}
+
+model GuideFAQ {
+  id       String @id @default(cuid())
+  guideId  String
+  guide    Guide  @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  question String
+  answer   String
+  order    Int    @default(0)
+}
+
+model GuideMedia {
+  id        String   @id @default(cuid())
+  url       String
+  filename  String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
 }

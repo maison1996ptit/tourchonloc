@@ -7,10 +7,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { Guide, GuideCategory } from '@/types/guide';
 import styles from '../tours/tours.module.css'; // Reusing tours layout styling
 
-export default function GuidesAdminPage() {
+export default function GuidesAdminPage({ isSubComponent = false }: { isSubComponent?: boolean }) {
   const router = useRouter();
   const { user } = useAuth();
   const isAdmin = user?.role === 'Admin';
+
+  useEffect(() => {
+    if (!isSubComponent) {
+      router.replace('/admin/blogs');
+    }
+  }, [isSubComponent, router]);
 
   const [guides, setGuides] = useState<Guide[]>([]);
   const [categories, setCategories] = useState<GuideCategory[]>([]);
@@ -20,6 +26,7 @@ export default function GuidesAdminPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -42,6 +49,7 @@ export default function GuidesAdminPage() {
         search: searchQuery,
         status: statusFilter,
         category: categoryFilter,
+        sortBy: sortBy,
         page: page.toString(),
         limit: limit.toString()
       });
@@ -63,9 +71,8 @@ export default function GuidesAdminPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchGuides();
-  }, [searchQuery, statusFilter, categoryFilter, page]);
+  }, [searchQuery, statusFilter, categoryFilter, sortBy, page]);
 
   const handleDelete = async (id: string, title: string) => {
     if (!isAdmin) {
@@ -91,21 +98,8 @@ export default function GuidesAdminPage() {
     }
   };
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>Quản lý Cẩm Nang (Story Block System)</h1>
-        {isAdmin ? (
-          <Link href="/admin/guides/create" className={styles.createBtn}>
-            ➕ Tạo Cẩm Nang mới
-          </Link>
-        ) : (
-          <span style={{ fontSize: '0.875rem', color: '#64748b', background: '#e2e8f0', padding: '6px 12px', borderRadius: '6px' }}>
-            Quyền xem danh sách (Editor)
-          </span>
-        )}
-      </div>
-
+  const renderContent = () => (
+    <>
       {/* Filter and Search controls */}
       <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
         <input
@@ -145,6 +139,17 @@ export default function GuidesAdminPage() {
             <option key={cat.id} value={cat.slug}>{cat.name}</option>
           ))}
         </select>
+        <select
+          value={sortBy}
+          onChange={(e) => {
+            setSortBy(e.target.value);
+            setPage(1);
+          }}
+          style={{ width: '180px', padding: '10px 15px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+        >
+          <option value="createdAt">Mới nhất</option>
+          <option value="views">Lượt xem nhiều nhất</option>
+        </select>
       </div>
 
       {loading ? (
@@ -160,6 +165,8 @@ export default function GuidesAdminPage() {
                   <th>Hình ảnh</th>
                   <th>Tiêu đề</th>
                   <th>Danh mục</th>
+                  <th>Bộ lọc (QG/TP)</th>
+                  <th>Lượt xem</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
@@ -179,6 +186,19 @@ export default function GuidesAdminPage() {
                       <span style={{ fontSize: '0.8rem', color: '#64748b' }}>/{guide.slug}</span>
                     </td>
                     <td>{guide.category?.name || 'Chưa phân loại'}</td>
+                    <td>
+                      {guide.country ? (
+                        <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600 }}>📍 {guide.country}</span>
+                      ) : (
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Chưa chọn QG</span>
+                      )}
+                      {guide.city && (
+                        <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748b' }}>🏙️ {guide.city}</span>
+                      )}
+                    </td>
+                    <td>
+                      <strong style={{ fontSize: '0.95rem', color: '#0284c7' }}>{guide.views}</strong>
+                    </td>
                     <td>
                       <span className={`${styles.statusTag} ${styles[guide.status.toLowerCase()]}`}>
                         {guide.status === 'Published' ? 'Công khai' : guide.status === 'Draft' ? 'Bản nháp' : 'Hẹn giờ'}
@@ -237,6 +257,47 @@ export default function GuidesAdminPage() {
           )}
         </>
       )}
+    </>
+  );
+
+  if (isSubComponent) {
+    return (
+      <div>
+        <div className={styles.header} style={{ marginTop: '10px' }}>
+          <h2>Danh sách cẩm nang du lịch (Guides)</h2>
+          {isAdmin ? (
+            <Link href="/admin/guides/create" className={styles.createBtn}>
+              ➕ Tạo Cẩm Nang mới
+            </Link>
+          ) : (
+            <span style={{ fontSize: '0.875rem', color: '#64748b', background: '#e2e8f0', padding: '6px 12px', borderRadius: '6px' }}>
+              Quyền xem danh sách (Editor)
+            </span>
+          )}
+        </div>
+        {renderContent()}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1>Quản lý Cẩm Nang (Story Block System)</h1>
+        {isAdmin ? (
+          <Link href="/admin/guides/create" className={styles.createBtn}>
+            ➕ Tạo Cẩm Nang mới
+          </Link>
+        ) : (
+          <span style={{ fontSize: '0.875rem', color: '#64748b', background: '#e2e8f0', padding: '6px 12px', borderRadius: '6px' }}>
+            Quyền xem danh sách (Editor)
+          </span>
+        )}
+      </div>
+      {renderContent()}
     </div>
   );
 }
+
+// Keep the old unused render logic at the bottom commented out or removed so that it compiles cleanly
+const UnusedPageEndMarker = () => null;

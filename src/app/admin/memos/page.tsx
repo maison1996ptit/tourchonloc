@@ -3,12 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import { blogService } from '@/services/blogService';
 import { Blog } from '@/types/blog';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import styles from '../tours/tours.module.css'; // Reusing tours CSS layout
 
-export default function MemosAdminPage() {
+export default function MemosAdminPage({ isSubComponent = false }: { isSubComponent?: boolean }) {
+  const router = useRouter();
   const { user } = useAuth();
+  
+  useEffect(() => {
+    if (!isSubComponent) {
+      router.replace('/admin/blogs');
+    }
+  }, [isSubComponent, router]);
   const isAdmin = user?.role === 'Admin';
 
   const [memos, setMemos] = useState<Blog[]>([]);
@@ -34,7 +42,6 @@ export default function MemosAdminPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMemos();
   }, []);
 
@@ -67,8 +74,6 @@ export default function MemosAdminPage() {
     return matchesSearch && matchesStatus;
   });
 
-
-
   // Pagination Logic
   const totalPages = Math.max(1, Math.ceil(filteredMemos.length / itemsPerPage));
   const paginatedMemos = filteredMemos.slice(
@@ -76,21 +81,8 @@ export default function MemosAdminPage() {
     currentPage * itemsPerPage
   );
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>Quản lý Memo Sales</h1>
-        {isAdmin ? (
-          <Link href="/admin/memos/create" className={styles.createBtn}>
-            ➕ Tạo Memo mới
-          </Link>
-        ) : (
-          <span style={{ fontSize: '0.875rem', color: '#64748b', background: '#e2e8f0', padding: '6px 12px', borderRadius: '6px' }}>
-            Quyền xem danh sách (Editor)
-          </span>
-        )}
-      </div>
-
+  const renderContent = () => (
+    <>
       {/* Filter and Search controls */}
       <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', alignItems: 'center' }}>
         <input
@@ -212,6 +204,44 @@ export default function MemosAdminPage() {
           )}
         </>
       )}
+    </>
+  );
+
+  if (isSubComponent) {
+    return (
+      <div>
+        <div className={styles.header} style={{ marginTop: '10px' }}>
+          <h2>Danh sách ghi nhớ bán hàng (Memos)</h2>
+          {isAdmin ? (
+            <Link href="/admin/memos/create" className={styles.createBtn}>
+              ➕ Tạo Memo mới
+            </Link>
+          ) : (
+            <span style={{ fontSize: '0.875rem', color: '#64748b', background: '#e2e8f0', padding: '6px 12px', borderRadius: '6px' }}>
+              Quyền xem danh sách (Editor)
+            </span>
+          )}
+        </div>
+        {renderContent()}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1>Quản lý Memo Sales</h1>
+        {isAdmin ? (
+          <Link href="/admin/memos/create" className={styles.createBtn}>
+            ➕ Tạo Memo mới
+          </Link>
+        ) : (
+          <span style={{ fontSize: '0.875rem', color: '#64748b', background: '#e2e8f0', padding: '6px 12px', borderRadius: '6px' }}>
+            Quyền xem danh sách (Editor)
+          </span>
+        )}
+      </div>
+      {renderContent()}
     </div>
   );
 }

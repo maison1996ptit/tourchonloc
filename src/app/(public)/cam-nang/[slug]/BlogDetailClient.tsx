@@ -1,410 +1,481 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { Blog } from '@/types/blog';
 import styles from './blog-detail.module.css';
-import memoStyles from '@/components/public/memo/Memo.module.css';
-import Link from 'next/link';
 
-// Import Memo components
-import HighlightBox from '@/components/public/memo/HighlightBox';
-import CTABlock from '@/components/public/memo/CTABlock';
-import TableOfContents from '@/components/public/memo/TableOfContents';
-import FAQ from '@/components/public/memo/FAQ';
+// Import New Redesigned Components
+import ReadingProgress from './components/ReadingProgress';
+import ArticleHero from './components/ArticleHero';
+import ArticleContent from './components/ArticleContent';
+import TableOfContents from './components/TableOfContents';
+import ShareButtons from './components/ShareButtons';
+import RelatedPosts from './components/RelatedPosts';
+import ArticleSidebar from './components/ArticleSidebar';
 
 interface BlogDetailClientProps {
   initialBlog: any;
-  relatedBlogs?: Blog[];
+  relatedBlogs?: any[];
+  allTours?: any[];
 }
 
-const toAnchor = (text: string) => text.toLowerCase().replace(/ /g, '-');
+const toAnchor = (text: string) => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
 
-function renderMemo(blog: any) {
-  const memo = blog.memoContent;
-  if (!memo) return <div>Nội dung memo không hợp lệ.</div>;
-
+// Inline FAQ Accordion Item for unified look
+const FAQAccordionItem = ({ question, answer }: { question: string; answer: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className={memoStyles.memoContainer}>
-      {blog.coverImage && (
-        <div className={memoStyles.coverImage} style={{ backgroundImage: `url(${blog.coverImage})` }} />
-      )}
-      
-      <HighlightBox
-        icon="🎣"
-        title="Hook"
-        content={memo.hook}
-      />
-      
-      {memo.tableOfContents && <TableOfContents items={memo.tableOfContents} />}
-
-      <section id={toAnchor("Vấn đề thường gặp khi săn sale")} className={memoStyles.memoSection}>
-        <h3>🤔 Vấn đề</h3>
-        <p>{memo.problem}</p>
-      </section>
-
-      <section id={toAnchor("Giải pháp công nghệ từ Tour Chọn Lọc")} className={memoStyles.memoSection}>
-        <h3>💡 Giải pháp</h3>
-        <p>{memo.solution}</p>
-      </section>
-
-      <section id={toAnchor("Kinh nghiệm đặt tour giá tốt")} className={memoStyles.memoSection}>
-        <h3>⭐ Kinh nghiệm thực tế</h3>
-        <p>{memo.experience}</p>
-      </section>
-
-      <section id={toAnchor("Lợi ích khi đặt qua chúng tôi")} className={memoStyles.memoSection}>
-        <h3>💎 Lợi ích</h3>
-        <p>{memo.benefits}</p>
-      </section>
-
-      {memo.cta && <CTABlock text={memo.cta.text} link={memo.cta.link} />}
-      
-      {memo.faq && <FAQ items={memo.faq} />}
-    </div>
-  );
-}
-
-function renderStandardBlog(blog: any) {
-  return (
-    <>
-      <div 
-        className={styles.hero} 
-        style={{ backgroundImage: `url(${blog.thumbnail})` }}
-      />
-      <div className={styles.content}>
-        <div className={styles.excerpt}>
-          {blog.excerpt}
+    <div className={styles.faqItem}>
+      <button 
+        className={styles.faqHeader} 
+        onClick={() => setIsOpen(!isOpen)} 
+        type="button"
+        aria-expanded={isOpen}
+      >
+        <span className={styles.faqQuestion}>{question}</span>
+        <span className={`${styles.faqIcon} ${isOpen ? styles.faqIconOpen : ''}`}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+      </button>
+      <div className={`${styles.faqAnswer} ${isOpen ? styles.faqAnswerOpen : ''}`}>
+        <div className={styles.faqAnswerInner}>
+          <p>{answer}</p>
         </div>
-        <div 
-          className={styles.body}
-          dangerouslySetInnerHTML={{ __html: blog.content.replace(/\n/g, '<br />') }} 
-        />
       </div>
-    </>
-  );
-}
-
-const ScrollReveal: React.FC<{ children: React.ReactNode; id?: string }> = ({ children, id }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.05,
-        rootMargin: '0px 0px -60px 0px'
-      }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      id={id}
-      className={`${styles.scrollReveal} ${isVisible ? styles.scrollRevealActive : ''}`}
-    >
-      {children}
     </div>
   );
 };
 
-export default function BlogDetailClient({ initialBlog, relatedBlogs = [] }: BlogDetailClientProps) {
-  const [scrollProgress, setScrollProgress] = useState(0);
+export default function BlogDetailClient({ initialBlog, relatedBlogs = [], allTours = [] }: BlogDetailClientProps) {
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+
+  // 10-second Promo Popup Timer
+  const [showPromo, setShowPromo] = useState(false);
 
   useEffect(() => {
-    if (!initialBlog || !initialBlog.isGuide) return;
+    // Set 3 seconds timer
+    const timer = setTimeout(() => {
+      setShowPromo(true);
+    }, 3000);
 
-    const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        setScrollProgress((window.scrollY / totalScroll) * 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const matchedTour = useMemo(() => {
+    // 1. Check if blog has directly related tours mapped in db
+    if (initialBlog?.relatedTours && initialBlog.relatedTours.length > 0) {
+      const firstRel = initialBlog.relatedTours[0];
+      if (firstRel && firstRel.tour) {
+        return firstRel.tour;
       }
-    };
+    }
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (!allTours || allTours.length === 0) return null;
+
+    // 2. Match by country field
+    if (initialBlog?.country) {
+      const targetCountry = initialBlog.country.toLowerCase();
+      const matched = allTours.filter(t => 
+        t.destination.toLowerCase().includes(targetCountry) || 
+        t.title.toLowerCase().includes(targetCountry)
+      );
+      if (matched.length > 0) return matched[0];
+    }
+
+    // 3. Match by keywords in title
+    const titleLower = (initialBlog?.title || '').toLowerCase();
+    const keywords = ['hàn quốc', 'nhật bản', 'hồng kông', 'trung quốc', 'singapore', 'thái lan', 'đài loan', 'châu âu', 'pháp', 'úc', 'mỹ'];
+    for (const keyword of keywords) {
+      if (titleLower.includes(keyword)) {
+        const matched = allTours.filter(t => 
+          t.destination.toLowerCase().includes(keyword) || 
+          t.title.toLowerCase().includes(keyword)
+        );
+        if (matched.length > 0) return matched[0];
+      }
+    }
+
+    // 4. Default fallback
+    return allTours[0];
+  }, [initialBlog, allTours]);
+
+  // 1. User View Tracking API call on mount
+  useEffect(() => {
+    if (initialBlog && initialBlog.slug && initialBlog.isGuide) {
+      fetch(`/api/guides/${initialBlog.slug}/view`, { method: 'POST' })
+        .then(res => {
+          if (!res.ok) console.error('Failed to log views');
+        })
+        .catch(err => console.error('Error logging views:', err));
+    }
   }, [initialBlog]);
 
-  if (!initialBlog) {
-    return <div className={styles.error}>Không tìm thấy bài viết. <Link href="/cam-nang">Quay lại</Link></div>;
-  }
-  
-  const blog = initialBlog;
 
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": blog.title,
-    "image": blog.thumbnail,
-    "datePublished": blog.publishedDate,
-    "dateModified": blog.updatedAt || blog.publishedDate,
-    "description": blog.excerpt,
-    "author": {
-      "@type": "Person",
-      "name": blog.author || "Chuyên gia Tour Chọn Lọc"
-    }
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubscribing(true);
+    setTimeout(() => {
+      setSubscribing(false);
+      setSubscribeSuccess(true);
+    }, 1200);
   };
 
-  // 1. Google Arts & Culture Story Immersive Rendering
-  if (blog.isGuide) {
-    const tocItems: { label: string; anchor: string }[] = [];
-    blog.blocks?.forEach((block: any, idx: number) => {
-      if (block.type === 'Timeline' && block.content.items?.length > 0) {
-        tocItems.push({ label: 'Lịch Trình Chi Tiết', anchor: `block-${idx}` });
-      } else if (block.type === 'Gallery' && block.content.images?.length > 0) {
-        tocItems.push({ label: 'Bộ Sưu Tập Ảnh', anchor: `block-${idx}` });
-      } else if (block.type === 'Quote') {
-        tocItems.push({ label: 'Góc Nhìn Chuyên Gia', anchor: `block-${idx}` });
-      } else if (block.type === 'Text' && idx === 0) {
-        tocItems.push({ label: 'Bắt Đầu Hành Trình', anchor: `block-${idx}` });
-      } else if (block.type === 'CTA') {
-        tocItems.push({ label: 'Đăng Ký & Nhận Ưu Đãi', anchor: `block-${idx}` });
-      }
-    });
-
-    if (tocItems.length === 0) {
-      tocItems.push({ label: 'Giới Thiệu Câu Chuyện', anchor: 'story-start' });
-    }
-
+  if (!initialBlog) {
     return (
-      <div className={styles.immersiveWrapper}>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-        />
-        {/* Reading progress bar */}
-        <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
-
-        {/* Immersive Hero Header */}
-        <div 
-          className={styles.immersiveHero}
-          style={{ backgroundImage: `url(${blog.thumbnail})` }}
-        >
-          <div className={styles.immersiveHeroContent}>
-            <span className={styles.immersiveCategory}>{blog.category}</span>
-            <h1 className={styles.immersiveTitle}>{blog.title}</h1>
-            <p className={styles.immersiveExcerpt}>{blog.excerpt}</p>
-            <div className={styles.immersiveMeta}>
-              <span>✍️ {blog.author}</span>
-              <span>•</span>
-              <span>📅 {new Date(blog.publishedDate).toLocaleDateString('vi-VN')}</span>
-              <span>•</span>
-              <span>⏱️ Đọc khoảng 5 phút</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Main story grid with sticky TOC */}
-        <div className={styles.immersiveBodyGrid} id="story-start">
-          <div className={styles.immersiveStoryContent}>
-            {blog.blocks?.map((block: any, idx: number) => {
-              const content = block.content;
-              const id = `block-${idx}`;
-              
-              let blockEl = null;
-              switch (block.type) {
-                case 'Text':
-                  blockEl = (
-                    <div className={styles.textBlock}>
-                      {content.text}
-                    </div>
-                  );
-                  break;
-                case 'Image':
-                  blockEl = (
-                    <div className={styles.imageBlock}>
-                      <img src={content.url} alt={content.caption || 'Story Image'} loading="lazy" />
-                      {content.caption && <p className={styles.imageCaption}>{content.caption}</p>}
-                    </div>
-                  );
-                  break;
-                case 'Quote':
-                  blockEl = (
-                    <blockquote className={styles.quoteBlock}>
-                      <p className={styles.quoteText}>"{content.text}"</p>
-                      {content.author && <cite className={styles.quoteAuthor}>— {content.author}</cite>}
-                    </blockquote>
-                  );
-                  break;
-                case 'Video':
-                  blockEl = (
-                    <div className={styles.videoBlock}>
-                      {content.platform === 'youtube' && (
-                        <iframe 
-                          src={content.url.includes('youtube.com/embed/') ? content.url : `https://www.youtube.com/embed/${content.url.split('v=')[1]?.split('&')[0] || content.url}`}
-                          title="YouTube video player"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      )}
-                      {content.platform !== 'youtube' && (
-                        <iframe src={content.url} title="Video player" frameBorder="0" allowFullScreen />
-                      )}
-                    </div>
-                  );
-                  break;
-                case 'CTA':
-                  blockEl = (
-                    <div className={styles.ctaBlock}>
-                      <a 
-                        href={content.link} 
-                        className={content.type === 'secondary' ? styles.ctaButtonSecondary : styles.ctaButton}
-                      >
-                        {content.text}
-                      </a>
-                    </div>
-                  );
-                  break;
-                case 'Gallery':
-                  blockEl = (
-                    <div className={styles.galleryBlock}>
-                      <h4 className={styles.galleryTitle}>🖼️ {content.title || 'Khoảnh khắc ấn tượng'}</h4>
-                      <div className={styles.galleryTrack}>
-                        {(content.images || []).map((img: any, i: number) => (
-                          <div key={i} className={styles.gallerySlide}>
-                            <img src={img.url} alt={img.caption || 'Slide'} loading="lazy" />
-                            {img.caption && <p>{img.caption}</p>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                  break;
-                case 'Timeline':
-                  blockEl = (
-                    <div className={styles.timelineBlock}>
-                      <h4 className={styles.timelineLabel}>🍂 Hành trình chặng chặng</h4>
-                      {(content.items || []).map((item: any, i: number) => (
-                        <div key={i} className={styles.timelineItem}>
-                          <span className={styles.timelineIcon}>{item.icon || '✓'}</span>
-                          <h4>{item.title}</h4>
-                          <p>{item.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                  break;
-                default:
-                  blockEl = null;
-              }
-
-              if (!blockEl) return null;
-              return (
-                <ScrollReveal key={idx} id={id}>
-                  {blockEl}
-                </ScrollReveal>
-              );
-            })}
-          </div>
-
-          <aside className={styles.sidebarTOC}>
-            <h4 className={styles.tocTitle}>CÂU CHUYỆN</h4>
-            <ul className={styles.tocList}>
-              {tocItems.map((item, idx) => (
-                <li key={idx}>
-                  <a href={`#${item.anchor}`} className={styles.tocLink}>
-                    {idx + 1}. {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        </div>
-
-        {/* Related Section at the bottom */}
-        {relatedBlogs.length > 0 && (
-          <section className={styles.relatedSection} style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 2rem' }}>
-            <h3 className={styles.relatedTitle} style={{ color: '#ffffff' }}>Cẩm Nang Liên Quan</h3>
-            <div className={styles.relatedGrid}>
-              {relatedBlogs.map((rBlog) => (
-                <Link href={`/cam-nang/${rBlog.slug}`} key={rBlog.id} className={styles.relatedCard} style={{ background: '#1e293b' }}>
-                  <div 
-                    className={styles.relatedThumb} 
-                    style={{ backgroundImage: `url(${rBlog.thumbnail})` }}
-                  />
-                  <div className={styles.relatedInfo}>
-                    <span className={styles.relatedCardCategory}>{rBlog.category}</span>
-                    <h4 style={{ color: '#ffffff' }}>{rBlog.title}</h4>
-                    <p style={{ color: '#94a3b8' }}>{rBlog.excerpt}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+      <div className={styles.error}>
+        Không tìm thấy bài viết. <br />
+        <Link href="/cam-nang" className={styles.backLink}>← Quay lại Cẩm nang</Link>
       </div>
     );
   }
 
-  // 2. Fallback to Traditional Blog or Memo rendering
-  return (
-    <article className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-      />
-      <header className={styles.header}>
-        <Link href="/cam-nang" className={styles.backLink}>← Quay lại Cẩm nang</Link>
-        <div className={styles.meta}>
-          <span className={styles.category}>{blog.category || blog.categoryId}</span>
-          <span className={styles.divider}>•</span>
-          <span className={styles.date}>{new Date(blog.publishedDate).toLocaleDateString('vi-VN')}</span>
-        </div>
-        <h1>{blog.title}</h1>
-      </header>
+  const blog = initialBlog;
 
-      {blog.isMemo ? renderMemo(blog) : renderStandardBlog(blog)}
+  // Build JSON-LD structured schemas
+  const schemas = useMemo(() => {
+    if (!blog) return [];
+    
+    // Breadcrumbs Schema
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Trang chủ",
+          "item": "https://tourchonloc.vn"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Cẩm nang du lịch",
+          "item": "https://tourchonloc.vn/cam-nang"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": blog.title,
+          "item": `https://tourchonloc.vn/cam-nang/${blog.slug}`
+        }
+      ]
+    };
 
-      {relatedBlogs.length > 0 && (
-        <section className={styles.relatedSection}>
-          <h3 className={styles.relatedTitle}>Cẩm Nang Liên Quan</h3>
-          <div className={styles.relatedGrid}>
-            {relatedBlogs.map((rBlog) => (
-              <Link href={`/cam-nang/${rBlog.slug}`} key={rBlog.id} className={styles.relatedCard}>
-                <div 
-                  className={styles.relatedThumb} 
-                  style={{ backgroundImage: `url(${rBlog.thumbnail})` }}
-                />
-                <div className={styles.relatedInfo}>
-                  <span className={styles.relatedCardCategory}>{rBlog.category || rBlog.categoryId}</span>
-                  <h4>{rBlog.title}</h4>
-                  <p>{rBlog.excerpt}</p>
-                </div>
-              </Link>
-            ))}
+    // Article/NewsArticle Schema
+    const articleSchema = {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "headline": blog.seoTitle || blog.title,
+      "image": [blog.thumbnail],
+      "datePublished": blog.publishedDate,
+      "dateModified": blog.updatedAt || blog.publishedDate,
+      "description": blog.seoDescription || blog.excerpt,
+      "author": {
+        "@type": "Person",
+        "name": blog.author || "Chuyên gia Tour Chọn Lọc"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Tour Chọn Lọc",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://tourchonloc.vn/logo.png"
+        }
+      }
+    };
+
+    // FAQ Schema
+    const faqItems: any[] = [];
+    if (blog.faqs && blog.faqs.length > 0) {
+      blog.faqs.forEach((f: any) => {
+        faqItems.push({
+          "@type": "Question",
+          "name": f.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": f.answer
+          }
+        });
+      });
+    }
+    blog.blocks?.forEach((b: any) => {
+      if (b.type === 'FAQ' && b.content.items) {
+        b.content.items.forEach((item: any) => {
+          if (item.question && item.answer) {
+            faqItems.push({
+              "@type": "Question",
+              "name": item.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": item.answer
+              }
+            });
+          }
+        });
+      }
+    });
+
+    const list = [breadcrumbSchema, articleSchema];
+    if (faqItems.length > 0) {
+      list.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqItems
+      } as any);
+    }
+    return list;
+  }, [blog]);
+
+  // Dynamic Memo Content Renderer inside Editorial Layout
+  const renderMemoContent = (memo: any) => {
+    if (!memo) return null;
+
+    return (
+      <div className={styles.memoContentContainer} id="article-content-body">
+        {/* Hook / Intro Quote */}
+        {memo.hook && (
+          <div className={styles.memoHookWrapper}>
+            <blockquote className={styles.memoHookQuote}>
+              <p className={styles.memoHookText}>"{memo.hook}"</p>
+            </blockquote>
           </div>
-        </section>
+        )}
+
+        {/* Problem */}
+        {memo.problem && (
+          <section className={styles.memoSection}>
+            <h2 id={toAnchor("Nỗi sợ khi tự lập kế hoạch")} className={styles.memoHeading}>
+              🤔 Vấn đề thường gặp khi lên kế hoạch
+            </h2>
+            <p className={styles.memoParagraph}>{memo.problem}</p>
+          </section>
+        )}
+
+        {/* Solution */}
+        {memo.solution && (
+          <section className={styles.memoSection}>
+            <h2 id={toAnchor("Giải pháp từ các 'Kiến trúc sư' du lịch")} className={styles.memoHeading}>
+              💡 Giải pháp công nghệ từ Tour Chọn Lọc
+            </h2>
+            <p className={styles.memoParagraph}>{memo.solution}</p>
+          </section>
+        )}
+
+        {/* Experience */}
+        {memo.experience && (
+          <section className={styles.memoSection}>
+            <h2 id={toAnchor("Quy trình làm việc khoa học")} className={styles.memoHeading}>
+              ⭐ Kinh nghiệm thực tế từ chuyên gia hành trình
+            </h2>
+            <p className={styles.memoParagraph}>{memo.experience}</p>
+          </section>
+        )}
+
+        {/* Benefits */}
+        {memo.benefits && (
+          <section className={styles.memoSection}>
+            <h2 id={toAnchor("Tại sao nên chọn chúng tôi?")} className={styles.memoHeading}>
+              💎 Lợi ích khi đồng hành cùng Tour Chọn Lọc
+            </h2>
+            <p className={styles.memoParagraph}>{memo.benefits}</p>
+          </section>
+        )}
+
+        {/* CTA Button Block */}
+        {memo.cta && (
+          <div className={styles.memoCtaBlock}>
+            <a href={memo.cta.link} className={styles.memoCtaBtn}>
+              {memo.cta.text}
+            </a>
+          </div>
+        )}
+
+        {/* FAQ Accordions */}
+        {memo.faq && memo.faq.length > 0 && (
+          <div className={styles.memoFaqBlock}>
+            <h2 id="cac-cau-hoi-thuong-gap" className={styles.memoHeading}>
+              ❓ Giải đáp câu hỏi thường gặp
+            </h2>
+            <div className={styles.memoFaqList}>
+              {memo.faq.map((item: any, i: number) => (
+                <FAQAccordionItem key={i} question={item.q} answer={item.a} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className={styles.wrapper}>
+      {/* Inject SEO Schemas */}
+      {schemas.map((schema, idx) => (
+        <script
+          key={idx}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+
+      {/* Reading Progress Indicator */}
+      <ReadingProgress />
+
+      {/* Full-width Magazine Cover Header */}
+      <ArticleHero
+        title={blog.title}
+        category={blog.category || 'Cẩm nang du lịch'}
+        publishedDate={blog.publishedDate}
+        readTime={blog.readTime || 7}
+        author={blog.author || 'Chuyên gia Tour Chọn Lọc'}
+        thumbnail={blog.thumbnail}
+        excerpt={blog.excerpt}
+      />
+
+      {/* Layout Grid */}
+      <div className={styles.layoutContainer} id="article-main-layout">
+        {/* Left Column: Share buttons */}
+        <div className={styles.shareCol}>
+          <ShareButtons title={blog.title} />
+        </div>
+
+        {/* Center Column: Main Content */}
+        <div className={styles.contentCol}>
+          {/* Mobile-only Table of Contents at the top of content */}
+          <div className={styles.mobileTocCol}>
+            <TableOfContents />
+          </div>
+
+          {/* Unified content render path for Memo, Guides and standard Blogs */}
+          {blog.isMemo ? (
+            renderMemoContent(blog.memoContent)
+          ) : (
+            <ArticleContent 
+              blocks={blog.blocks} 
+              content={blog.content} 
+              relatedTours={blog.relatedTours} 
+              faqs={blog.faqs} 
+            />
+          )}
+
+          {/* Tags footer */}
+          {blog.tags && blog.tags.length > 0 && (
+            <div className={styles.articleTagsFooter}>
+              {blog.tags.map((tag: string) => (
+                <span key={tag} className={styles.tagBadge}>
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Premium Author Section */}
+          <div className={styles.authorCard}>
+            <img 
+              src="/chatbotLogo.png" 
+              alt={blog.author || 'Chuyên gia Tour Chọn Lọc'} 
+              className={styles.authorAvatar} 
+            />
+            <div className={styles.authorInfo}>
+              <span className={styles.authorRole}>Biên tập viên Du lịch</span>
+              <h5 className={styles.authorName}>{blog.author || 'Chuyên gia Tour Chọn Lọc'}</h5>
+              <p className={styles.authorBio}>
+                Đam mê khám phá những mảnh đất xa xôi, chia sẻ những câu chuyện văn hóa chân thực và các mẹo du lịch chuyên sâu. Viết bài cho National Geographic Travel và Condé Nast Traveler.
+              </p>
+            </div>
+          </div>
+
+          {/* Luxury Newsletter Subscription Box */}
+          <div className={styles.newsletterCard}>
+            <h4 className={styles.newsletterTitle}>Nhận cảm hứng hành trình kế tiếp</h4>
+            <p className={styles.newsletterDesc}>
+              Đăng ký bản tin hàng tuần của chúng tôi để nhận những câu chuyện du lịch độc quyền, kinh nghiệm thực tế và các ưu đãi tour sớm nhất.
+            </p>
+            {subscribeSuccess ? (
+              <div style={{ color: '#10b981', fontWeight: 600, fontSize: '1.05rem', marginTop: '1rem' }}>
+                ✓ Cảm ơn bạn đã đăng ký! Chúng tôi sẽ sớm gửi thư đến bạn.
+              </div>
+            ) : (
+              <form className={styles.newsletterForm} onSubmit={handleSubscribe}>
+                <input 
+                  type="email" 
+                  placeholder="Địa chỉ email của bạn" 
+                  className={styles.newsletterInput} 
+                  required 
+                  disabled={subscribing}
+                />
+                <button type="submit" className={styles.newsletterSubmit} disabled={subscribing}>
+                  {subscribing ? 'Đang gửi...' : 'Đăng ký'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Sticky Desktop Table of Contents */}
+        <div className={styles.sidebarCol}>
+          <ArticleSidebar>
+            <TableOfContents />
+          </ArticleSidebar>
+        </div>
+      </div>
+
+      {/* Related Posts magazine grid at the bottom */}
+      {relatedBlogs && relatedBlogs.length > 0 && (
+        <div className={styles.relatedWrapper}>
+          <div className={styles.relatedContainer}>
+            <RelatedPosts posts={relatedBlogs} />
+          </div>
+        </div>
       )}
 
-      <footer className={styles.footer}>
-        <div className={styles.tags}>
-          {blog.tags?.map((tag: string) => (
-            <span key={tag} className={styles.tag}>#{tag}</span>
-          ))}
-        </div>
-        <div className={styles.share}>
-          <h3>Chia sẻ bài viết</h3>
-          <div className={styles.shareBtns}>
-            <button className={styles.shareBtn}>Facebook</button>
-            <button className={styles.shareBtn}>Twitter</button>
+
+
+      {/* Dynamic Contextual Tour Promotion Popup */}
+      {showPromo && matchedTour && (
+        <div className={styles.promoPopup}>
+          <div className={styles.promoContent}>
+            <button 
+              className={styles.promoClose} 
+              onClick={() => {
+                setShowPromo(false);
+              }}
+              aria-label="Đóng quảng cáo"
+            >
+              ✕
+            </button>
+            <div className={styles.promoImageWrapper}>
+              <div 
+                className={styles.promoImage} 
+                style={{ backgroundImage: `url(${matchedTour.featuredImage || '/images/default-tour.jpg'})` }}
+              />
+              <span className={styles.promoTag}>🔥 BÁN CHẠY</span>
+            </div>
+            <div className={styles.promoBody}>
+              <span className={styles.promoLabel}>📍 GỢI Ý HÀNH TRÌNH CHO BẠN</span>
+              <h4 className={styles.promoTitle}>{matchedTour.title}</h4>
+              <div className={styles.promoDetails}>
+                <span>⏳ Thời gian: {matchedTour.durationDays} ngày {matchedTour.durationNights} đêm</span>
+                <span>🏷️ Giá từ: <strong className={styles.promoPrice}>{matchedTour.priceFrom.toLocaleString('vi-VN')} đ</strong></span>
+              </div>
+              <Link 
+                href={`/tours/${matchedTour.slug}`} 
+                className={styles.promoCta}
+                onClick={() => {
+                  setShowPromo(false);
+                }}
+              >
+                Khám phá ngay →
+              </Link>
+            </div>
           </div>
         </div>
-      </footer>
-    </article>
+      )}
+    </div>
   );
 }

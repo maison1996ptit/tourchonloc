@@ -3,6 +3,7 @@ import Header from '@/components/public/Header';
 import Footer from '@/components/public/Footer';
 import SeasonalEffect from '@/components/public/SeasonalEffect';
 import AiAssistantWidget from '@/components/public/AiAssistant/AiAssistantWidget';
+import BackToTop from '@/components/public/BackToTop';
 
 export default function PublicLayout({
   children,
@@ -18,6 +19,7 @@ export default function PublicLayout({
         <main>{children}</main>
         <Footer />
         <AiAssistantWidget />
+        <BackToTop />
       </div>
     </div>
   );

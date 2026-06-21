@@ -11,8 +11,9 @@
   --text-inverse: #F8FAFC;
   --text-inverse-muted: #CBD5E1;
 
-  --font-family: var(--font-body), 'Raleway', sans-serif;
-  --font-heading-family: var(--font-heading), 'Raleway', sans-serif;
+  --font-family: var(--font-body), 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-heading-family: var(--font-heading), 'Montserrat', sans-serif;
+  --font-sans: var(--font-body), 'Plus Jakarta Sans', -apple-system, sans-serif;
   --border-radius: 16px;
   
   --admin-sidebar-width: 250px;
@@ -158,7 +159,6 @@ img {
   }
 
   /* 3. Nút bấm trên di động phải to và rõ ràng, loại trừ các nút chức năng nhỏ */
-  form button, 
   button[type="submit"],
   .submitBtn,
   .actionBtn,
@@ -171,7 +171,7 @@ img {
   }
 
   /* Tăng touch target cho các nút bấm nhỏ bằng padding thay vì giãn chiều rộng */
-  button {
+  button:not([class]) {
     min-height: 44px;
     padding: 8px 16px;
   }

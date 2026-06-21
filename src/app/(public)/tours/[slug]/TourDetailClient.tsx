@@ -22,9 +22,11 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showStickyBadge, setShowStickyBadge] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [activeDay, setActiveDay] = useState<number | null>(1);
   
   const sliderRef = useRef<HTMLDivElement>(null);
   const gallerySliderRef = useRef<HTMLDivElement>(null);
+  const heroBadgeRef = useRef<HTMLDivElement>(null);
 
   // Utility to handle various date formats (ISO and DD/MM/YYYY)
   const parseDate = (dateStr: string) => {
@@ -74,12 +76,42 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
     };
     fetchGearData();
 
-    const handleScroll = () => {
-      setShowStickyBadge(window.scrollY > 400);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, [initialTour]);
+
+  // Dynamically show sticky booking badge only when the hero badge is completely out of view
+  useEffect(() => {
+    if (loading) return;
+
+    const handleScroll = () => {
+      const heroBadge = heroBadgeRef.current;
+      if (!heroBadge) {
+        setShowStickyBadge(false);
+        return;
+      }
+
+      const rect = heroBadge.getBoundingClientRect();
+      // The hero badge is visible if its bottom is above the viewport fold and top is below the screen top
+      const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+
+      // Force hide sticky badge if hero badge is visible, or if we are near the top
+      if (isVisible || window.scrollY < 100) {
+        setShowStickyBadge(false);
+      } else {
+        setShowStickyBadge(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    // Initial check
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [loading]);
 
   // Handle auto-scroll
   useEffect(() => {
@@ -105,8 +137,9 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
   if (loading) return <div className={styles.loading}>{t('common.loading')}</div>;
   if (!tour) return <div className={styles.error}>{t('tours.no_results')} <Link href="/tours">{t('tour_detail.back_to_tours')}</Link></div>;
 
-  const BookingBadge = ({ isSticky = false }) => (
+  const BookingBadge = ({ isSticky = false, innerRef }: { isSticky?: boolean; innerRef?: React.RefObject<HTMLDivElement | null> }) => (
     <div 
+      ref={innerRef}
       className={`${styles.bookingBadge} ${isSticky ? styles.stickyBadge : ''}`}
       onClick={() => setIsModalOpen(true)}
     >
@@ -151,19 +184,52 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
         <div className={styles.headerContent}>
           <Link href="/tours" className={styles.backLink}>← {t('tour_detail.back_to_tours')}</Link>
           <h1>{tour.title}</h1>
-          <p className={styles.meta}>
-            {tour.destination} • {tour.durationDays}{t('common.days').charAt(0)}/{tour.durationNights}{t('common.nights').charAt(0)} • {tour.category}
-          </p>
+          <div className={styles.metaBadges}>
+            <span className={styles.metaBadge}>📍 {tour.destination}</span>
+            <span className={styles.metaBadge}>⏱️ {tour.durationDays}{t('common.days').charAt(0)}/{tour.durationNights}{t('common.nights').charAt(0)}</span>
+            <span className={styles.metaBadge}>🏷️ {tour.category}</span>
+          </div>
         </div>
       </header>
 
       <div className={styles.hero} style={{ backgroundImage: `url(${tour.featuredImage})` }}>
-        <BookingBadge />
+        <BookingBadge innerRef={heroBadgeRef} />
       </div>
 
       {showStickyBadge && <BookingBadge isSticky={true} />}
 
       <main className={styles.main}>
+        <div className={styles.trustBanner}>
+          <div className={styles.trustItem}>
+            <span className={styles.trustIcon}>🛡️</span>
+            <div className={styles.trustText}>
+              <strong>Dịch vụ uy tín</strong>
+              <span>Khởi hành chắc chắn, bảo hiểm trọn gói</span>
+            </div>
+          </div>
+          <div className={styles.trustItem}>
+            <span className={styles.trustIcon}>🏨</span>
+            <div className={styles.trustText}>
+              <strong>Lưu trú cao cấp</strong>
+              <span>Hệ thống khách sạn 4-5 sao chuẩn quốc tế</span>
+            </div>
+          </div>
+          <div className={styles.trustItem}>
+            <span className={styles.trustIcon}>🗣️</span>
+            <div className={styles.trustText}>
+              <strong>HDV chuyên nghiệp</strong>
+              <span>Am hiểu sâu sắc, tận tâm suốt tuyến</span>
+            </div>
+          </div>
+          <div className={styles.trustItem}>
+            <span className={styles.trustIcon}>💎</span>
+            <div className={styles.trustText}>
+              <strong>Giá trị độc quyền</strong>
+              <span>Lộ trình chọn lọc, trải nghiệm khác biệt</span>
+            </div>
+          </div>
+        </div>
+
         <section className={styles.section}>
           <h2>{t('tour_detail.overview')}</h2>
           <p className={styles.overview}>{tour.overview}</p>
@@ -241,15 +307,29 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
         <section className={styles.section}>
           <h2>{t('tour_detail.itinerary')}</h2>
           <div className={styles.itinerary}>
-            {tour.itinerary?.map((item) => (
-              <div key={item.day} className={styles.day}>
-                <div className={styles.dayNumber}>{t('common.days').charAt(0)}{item.day}</div>
-                <div className={styles.dayContent}>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
+            {tour.itinerary?.map((item) => {
+              const isOpen = activeDay === item.day;
+              return (
+                <div 
+                  key={item.day} 
+                  className={`${styles.day} ${isOpen ? styles.dayOpen : ''}`}
+                  onClick={() => setActiveDay(isOpen ? null : item.day)}
+                >
+                  <div className={styles.dayNumber}>{t('common.days').charAt(0)}{item.day}</div>
+                  <div className={styles.dayContent}>
+                    <div className={styles.dayHeader}>
+                      <h3>{item.title}</h3>
+                      <span className={styles.accordionArrow}>{isOpen ? '▲' : '▼'}</span>
+                    </div>
+                    {isOpen && (
+                      <div className={styles.dayDescription}>
+                        <p>{item.description}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -338,7 +418,7 @@ export default function TourDetailClient({ initialTour }: TourDetailClientProps)
                     <div key={idx} className={styles.affiliateCard}>
                       <div 
                         className={styles.affiliateImage} 
-                        style={{ backgroundImage: `url(${item.imageUrl || 'https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&q=80&w=300'})` }}
+                        style={{ backgroundImage: `url(${item.imageUrl || '/images/guides/v1.jpg'})` }}
                       ></div>
                       <div className={styles.affiliateInfo}>
                         <h4>{item.title}</h4>

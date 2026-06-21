@@ -1,6 +1,7 @@
 import { CountryGuideMap } from '@/types/guideMap';
+import { countryDetailsEnrichment } from './countryDetails';
 
-export const mockGuideMaps: CountryGuideMap[] = [
+const baseGuideMaps: CountryGuideMap[] = [
   {
     "id": "vn-map",
     "countryName": "Việt Nam",
@@ -6533,3 +6534,18 @@ export const mockGuideMaps: CountryGuideMap[] = [
     "mascot": "🐂"
   }
 ];
+
+export const mockGuideMaps: CountryGuideMap[] = baseGuideMaps.map(guide => {
+  const enrich = countryDetailsEnrichment[guide.countrySlug];
+  if (enrich) {
+    return {
+      ...guide,
+      introduction: enrich.introduction,
+      cultureInfo: enrich.cultureInfo,
+      historyInfo: enrich.historyInfo,
+      geographyInfo: enrich.geographyInfo,
+      populationInfo: enrich.populationInfo
+    };
+  }
+  return guide;
+});

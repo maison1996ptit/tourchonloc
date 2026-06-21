@@ -1,0 +1,38 @@
+.sidebar {
+  width: 100%;
+}
+
+.sidebarSticky {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Thin custom scrollbar for sidebar elements */
+.sidebarSticky::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebarSticky::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebarSticky::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.sidebarSticky::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@media (max-width: 1279px) {
+  .sidebar {
+    display: none;
+  }
+}

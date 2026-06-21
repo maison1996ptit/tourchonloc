@@ -36,7 +36,7 @@ export default function Footer() {
           <div>
             <div className={styles.footerLogoContainer}>
               <img 
-                src="/logo.png" 
+                src="/logo.png?v=2" 
                 alt={settings.websiteName} 
                 className={styles.footerLogo}
                 style={{ width: 'auto', height: '50px', objectFit: 'contain' }}

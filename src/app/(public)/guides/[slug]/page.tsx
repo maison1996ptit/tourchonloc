@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `Cẩm Nang Du Lịch ${guide.countryName} | Tour Chọn Lọc`,
       description: guide.introduction || `Khám phá các địa danh nổi tiếng, cẩm nang bản đồ, kinh nghiệm văn hóa tại ${guide.countryName}.`,
       type: 'article',
-      url: `https://travelapp.com/guides/${guide.countrySlug}`,
+      url: `https://tourchonloc.com/guides/${guide.countrySlug}`,
       images: [
         {
           url: guide.markers[0]?.imageUrl || '/images/default-share.jpg',
@@ -56,6 +56,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+import { prisma } from '@/lib/prisma';
+
 export default async function CountryGuidePage({ params }: Props) {
   const { slug } = await params;
   const guide = await guideService.getCountryGuideBySlug(slug);
@@ -63,5 +65,24 @@ export default async function CountryGuidePage({ params }: Props) {
     notFound();
   }
 
-  return <CountryGuideClient guide={guide} />;
+  // Fetch published tours for the contextual promo popup
+  const activeTours = await prisma.tour.findMany({
+    where: { status: 'Published' },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      destination: true,
+      priceFrom: true,
+      durationDays: true,
+      durationNights: true,
+      featuredImage: true,
+      departureDates: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  return <CountryGuideClient guide={guide} allTours={activeTours as any[]} />;
 }

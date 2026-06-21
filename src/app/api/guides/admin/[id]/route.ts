@@ -15,7 +15,22 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { title, slug, excerpt, coverImage, status, categoryId, tagIds = [], seo = {}, blocks = [] } = body;
+    const { 
+      title, 
+      slug, 
+      excerpt, 
+      coverImage, 
+      thumbnail = '', 
+      country = '', 
+      city = '', 
+      status, 
+      categoryId, 
+      tagIds = [], 
+      seo = {}, 
+      blocks = [],
+      relatedTourIds = [],
+      faqs = []
+    } = body;
 
     // Check if Guide exists
     const existing = await prisma.guide.findUnique({
@@ -44,6 +59,9 @@ export async function PUT(
           slug,
           excerpt,
           coverImage,
+          thumbnail: thumbnail || null,
+          country: country || null,
+          city: city || null,
           status: status as GuideStatus,
           publishedAt: status === 'Published' && !existing.publishedAt ? new Date() : existing.publishedAt,
           categoryId: categoryId || null,
@@ -84,7 +102,7 @@ export async function PUT(
         });
       }
 
-      // 3. Sync blocks (delete old, insert new to ensure order matches exactly)
+      // 3. Sync blocks (delete old, insert new)
       await tx.guideBlock.deleteMany({
         where: { guideId: id }
       });
@@ -103,6 +121,41 @@ export async function PUT(
         }
       }
 
+      // 4. Sync related tours (delete old, insert new)
+      await tx.guideRelatedTour.deleteMany({
+        where: { guideId: id }
+      });
+
+      if (relatedTourIds && relatedTourIds.length > 0) {
+        for (let i = 0; i < relatedTourIds.length; i++) {
+          await tx.guideRelatedTour.create({
+            data: {
+              guideId: id,
+              tourId: relatedTourIds[i],
+              order: i
+            }
+          });
+        }
+      }
+
+      // 5. Sync FAQs (delete old, insert new)
+      await tx.guideFAQ.deleteMany({
+        where: { guideId: id }
+      });
+
+      if (faqs && faqs.length > 0) {
+        for (let i = 0; i < faqs.length; i++) {
+          await tx.guideFAQ.create({
+            data: {
+              guideId: id,
+              question: faqs[i].question,
+              answer: faqs[i].answer,
+              order: i
+            }
+          });
+        }
+      }
+
       return tx.guide.findUnique({
         where: { id },
         include: {
@@ -110,6 +163,14 @@ export async function PUT(
           tags: true,
           seo: true,
           blocks: {
+            orderBy: { order: 'asc' }
+          },
+          relatedTours: {
+            include: {
+              tour: true
+            }
+          },
+          faqs: {
             orderBy: { order: 'asc' }
           }
         }

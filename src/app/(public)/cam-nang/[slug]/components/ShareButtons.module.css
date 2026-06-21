@@ -1,0 +1,102 @@
+.shareContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 150px;
+  height: fit-content;
+  z-index: 10;
+}
+
+.shareLabel {
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.1em;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  margin-bottom: 4px;
+}
+
+.buttonsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shareLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  text-decoration: none;
+  padding: 0;
+  outline: none;
+}
+
+.shareLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.facebook:hover {
+  background: #1877f2;
+  color: #ffffff;
+  border-color: #1877f2;
+}
+
+.instagram:hover {
+  background: #e1306c;
+  color: #ffffff;
+  border-color: #e1306c;
+}
+
+.copy:hover {
+  background: var(--primary-color, #4f46e5);
+  color: #ffffff;
+  border-color: var(--primary-color, #4f46e5);
+}
+
+.svgIcon {
+  display: block;
+}
+
+.checkIcon {
+  font-size: 1.1rem;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+@media (max-width: 1279px) {
+  .shareContainer {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    margin: 2rem 0;
+    padding: 1.25rem;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    gap: 16px;
+  }
+
+  .shareLabel {
+    writing-mode: horizontal-tb;
+    margin-bottom: 0;
+  }
+
+  .buttonsList {
+    flex-direction: row;
+    gap: 16px;
+  }
+}

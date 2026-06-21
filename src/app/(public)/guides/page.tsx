@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cẩm Nang Du Lịch | Tour Chọn Lọc',
     description: 'Trải nghiệm cẩm nang du lịch bản đồ với hơn 100+ địa danh nổi tiếng tại Việt Nam, Nhật Bản, Châu Âu, Trung Quốc, Hàn Quốc, Đài Loan.',
-    url: 'https://travelapp.com/guides',
+    url: 'https://tourchonloc.com/guides',
     type: 'website',
     images: [
       {

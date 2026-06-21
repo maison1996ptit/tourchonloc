@@ -23,19 +23,28 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const fetchStats = async () => {
-      const [tours, blogs, leads] = await Promise.all([
-        tourService.getTours(),
-        blogService.getBlogs(),
-        leadService.getLeads()
-      ]);
+      const toursData = await tourService.getTours();
+      const leadsData = await leadService.getLeads();
+      
+      let guidesCount = 0;
+      try {
+        const guidesRes = await fetch('/api/guides?status=All');
+        if (guidesRes.ok) {
+          const result = await guidesRes.json();
+          guidesCount = result.data?.length || 0;
+        }
+      } catch (err) {
+        console.error('Error fetching guides for dashboard stats:', err);
+      }
+
       setStats({
-        tours: tours.length,
-        blogs: blogs.length,
-        leads: leads.length,
+        tours: toursData.length,
+        blogs: guidesCount,
+        leads: leadsData.length,
         testimonials: 1
       });
-      setRecentLeads(leads.slice(0, 5));
-      setRecentTours(tours.slice(0, 5));
+      setRecentLeads(leadsData.slice(0, 5));
+      setRecentTours(toursData.slice(0, 5));
     };
     fetchStats();
   }, []);
@@ -50,7 +59,7 @@ export default function DashboardPage() {
           <p className={styles.statNumber}>{stats.tours}</p>
         </div>
         <div className={styles.statCard}>
-          <h3>📝 Total Blogs</h3>
+          <h3>📝 Total Articles</h3>
           <p className={styles.statNumber}>{stats.blogs}</p>
         </div>
         <div className={styles.statCard}>

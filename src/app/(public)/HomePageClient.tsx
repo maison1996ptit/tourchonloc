@@ -17,6 +17,13 @@ interface HomePageClientProps {
   initialTestimonials: Testimonial[];
 }
 
+const BACKGROUND_VIDEOS = [
+  '/videos/13690411_1920_1080_60fps.mp4',
+  '/videos/12530954_2160_3840_60fps.mp4',
+  '/videos/8340999-uhd_3840_2160_30fps.mp4',
+  '/videos/13464100_3840_2160_30fps.mp4'
+];
+
 export default function HomePageClient({
   settings,
   initialFeaturedTours,
@@ -26,6 +33,12 @@ export default function HomePageClient({
   const { t } = useLanguage();
   const { theme } = useTheme();
   const sliderRef = React.useRef<HTMLDivElement>(null);
+
+  const [currentVideoIdx, setCurrentVideoIdx] = useState(0);
+
+  const handleVideoEnded = () => {
+    setCurrentVideoIdx((prev) => (prev + 1) % BACKGROUND_VIDEOS.length);
+  };
 
   const scrollPrev = () => {
     if (sliderRef.current) {
@@ -86,8 +99,8 @@ export default function HomePageClient({
     "@context": "https://schema.org",
     "@type": "TravelAgency",
     "name": "Tour Chọn Lọc",
-    "url": "https://travelapp.com",
-    "logo": "https://travelapp.com/logo.png",
+    "url": "https://tourchonloc.com",
+    "logo": "https://tourchonloc.com/logo.png",
     "description": settings.seoDefaultDescription || "Đại lý du lịch sang trọng, chuyên cung cấp các tour du lịch tinh hoa và bản đồ cẩm nang.",
     "telephone": settings.contactInfo ? (settings.contactInfo as any).phone : "",
     "address": {
@@ -102,12 +115,12 @@ export default function HomePageClient({
   const searchSchemaJson = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "url": "https://travelapp.com",
+    "url": "https://tourchonloc.com",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://travelapp.com/tours?search={search_term_string}"
+        "urlTemplate": "https://tourchonloc.com/tours?search={search_term_string}"
       },
       "query-input": "required name=search_term_string"
     }
@@ -125,7 +138,19 @@ export default function HomePageClient({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(searchSchemaJson) }}
       />
 
-      <section className={styles.hero} style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${settings.heroImage})` }}>
+      <section className={styles.hero}>
+        <video 
+          key={currentVideoIdx}
+          autoPlay 
+          muted 
+          playsInline 
+          className={styles.heroVideo}
+          poster={settings.heroImage}
+          onEnded={handleVideoEnded}
+        >
+          <source src={BACKGROUND_VIDEOS[currentVideoIdx]} type="video/mp4" />
+        </video>
+        <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
           <h1>
             <span className={styles.titleHighlightWrapper}>
